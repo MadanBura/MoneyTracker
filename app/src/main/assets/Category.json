@@ -1,0 +1,66 @@
+{
+  "income": [
+    {
+      "name": "Salary",
+      "subcategories": ["Primary Paycheck", "Bonus"]
+    },
+    {
+      "name": "Business",
+      "subcategories": ["Freelance", "Side Hustle"]
+    },
+    {
+      "name": "Investments",
+      "subcategories": ["Dividends", "Interest"]
+    },
+    {
+      "name": "Gifts & Refunds",
+      "subcategories": ["Cash Gifts", "Reimbursements"]
+    },
+    {
+      "name": "Other Income",
+      "subcategories": []
+    }
+  ],
+  "expenses": [
+    {
+      "name": "Food & Drink",
+      "subcategories": ["Groceries", "Dining Out", "Coffee", "Bars & Alcohol"]
+    },
+    {
+      "name": "Home & Utilities",
+      "subcategories": ["Rent", "Electricity", "Water", "Internet", "Maintenance"]
+    },
+    {
+      "name": "Transport & Auto",
+      "subcategories": ["Fuel", "Public Transport", "Taxi", "Car Maintenance", "Parking"]
+    },
+    {
+      "name": "Health & Personal Care",
+      "subcategories": ["Medical", "Pharmacy", "Gym", "Salon"]
+    },
+    {
+      "name": "Shopping & Lifestyle",
+      "subcategories": ["Clothes", "Electronics", "Books", "Entertainment"]
+    },
+    {
+      "name": "Travel",
+      "subcategories": ["Flights", "Hotels", "Local Transport", "Touring"]
+    },
+    {
+      "name": "Bills & Subscriptions",
+      "subcategories": ["Insurance", "Loans/EMI", "Credit Card", "Streaming Services"]
+    },
+    {
+      "name": "Finance & Taxes",
+      "subcategories": ["Bank Fees", "Income Tax", "Savings"]
+    },
+    {
+      "name": "Gifts & Donations",
+      "subcategories": ["Charity", "Presents"]
+    },
+    {
+      "name": "Other",
+      "subcategories": ["Pet Care", "Personal Projects", "Uncategorized"]
+    }
+  ]
+}

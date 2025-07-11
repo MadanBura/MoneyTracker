@@ -13,9 +13,9 @@ sealed class SealedBottomNavItem(
     val icon: Int,
     val label: String
 ) {
-    object records : SealedBottomNavItem("records", R.drawable.records, "Dashboard")
-    object charts : SealedBottomNavItem("charts", R.drawable.chart, "Search")
-    object add : SealedBottomNavItem("add", R.drawable.add, "Cart")
-    object reports : SealedBottomNavItem("reports",R.drawable.reports, "Profile")
-    object me : SealedBottomNavItem("me", R.drawable.me, "Profile")
+    object records : SealedBottomNavItem("records", R.drawable.records, "Records")
+    object charts : SealedBottomNavItem("charts", R.drawable.chart, "Charts")
+    object add : SealedBottomNavItem("add", R.drawable.add, "Add")
+    object reports : SealedBottomNavItem("reports",R.drawable.reports, "Reports")
+    object me : SealedBottomNavItem("me", R.drawable.me, "Me")
 }

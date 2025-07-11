@@ -2,9 +2,9 @@ package com.neo.moneytracker.ui.screens
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+
 
 @Composable
-fun ReportsScreen() {
-    Text("HIi")
+fun ChartScreen() {
+    Text("ChartScreen")
 }

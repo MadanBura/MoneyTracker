@@ -10,20 +10,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.neo.moneytracker.ui.navigation.SealedBottomNavItem
-
+import com.neo.moneytracker.ui.theme.LemonSecondary
+import com.neo.moneytracker.ui.theme.YellowOrange
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
-
     val items = listOf(
         SealedBottomNavItem.records,
         SealedBottomNavItem.charts,
-        SealedBottomNavItem.add,      // Center FAB-style icon
+        SealedBottomNavItem.add,
         SealedBottomNavItem.reports,
         SealedBottomNavItem.me
     )
@@ -36,12 +37,13 @@ fun BottomNavigationBar(navController: NavController) {
         val currentDestination = navBackStackEntry?.destination
 
         items.forEachIndexed { index, item ->
+            val isSelected = currentDestination?.route == item.route
+
             if (item == SealedBottomNavItem.add) {
-                // Center FAB-style icon
                 NavigationBarItem(
-                    selected = false, // You can style selected state if needed
+                    selected = false,
                     onClick = {
-                        if (currentDestination?.route != item.route) {
+                        if (!isSelected) {
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     saveState = true
@@ -53,9 +55,9 @@ fun BottomNavigationBar(navController: NavController) {
                     icon = {
                         androidx.compose.foundation.layout.Box(
                             modifier = Modifier
-                                .size(48.dp)
+                                .size(54.dp)
                                 .background(
-                                    color = Light,
+                                    color = LemonSecondary,
                                     shape = androidx.compose.foundation.shape.CircleShape
                                 ),
                             contentAlignment = androidx.compose.ui.Alignment.Center
@@ -63,27 +65,32 @@ fun BottomNavigationBar(navController: NavController) {
                             Icon(
                                 painter = painterResource(id = item.icon),
                                 contentDescription = item.label,
-                                modifier = Modifier.size(24.dp),
-                                tint = MaterialTheme.colorScheme.onPrimary
+                                modifier = Modifier.size(18.dp),
+                                tint = Color.Black
                             )
                         }
                     },
-                    label = { Text("") } // Optional: you can leave the label empty
+                    label = { Text("") }
                 )
             } else {
-                // Default navigation items
                 NavigationBarItem(
                     icon = {
                         Icon(
                             painter = painterResource(id = item.icon),
                             contentDescription = item.label,
                             modifier = Modifier.size(20.dp),
+                            tint = if (isSelected) YellowOrange else MaterialTheme.colorScheme.onBackground
                         )
                     },
-                    label = { Text(text = item.label) },
-                    selected = currentDestination?.route == item.route,
+                    label = {
+                        Text(
+                            text = item.label,
+                            color = if (isSelected) YellowOrange else MaterialTheme.colorScheme.onBackground
+                        )
+                    },
+                    selected = isSelected,
                     onClick = {
-                        if (currentDestination?.route != item.route) {
+                        if (!isSelected) {
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     saveState = true

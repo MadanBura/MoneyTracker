@@ -2,6 +2,7 @@ package com.neo.moneytracker.ui.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -14,7 +15,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.neo.moneytracker.ui.components.BottomNavigationBar
-import com.neo.moneytracker.ui.screens.ReportsScreen
+import com.neo.moneytracker.ui.screens.AddScreen
+import com.neo.moneytracker.ui.screens.ChartScreen
+import com.neo.moneytracker.ui.screens.MeScreen
+import com.neo.moneytracker.ui.screens.RecordScreen
+import com.neo.moneytracker.ui.screens.ReportScreen
 
 @Composable
 fun AppNavHost(navHostController: NavHostController) {
@@ -28,8 +33,6 @@ fun AppNavHost(navHostController: NavHostController) {
         SealedBottomNavItem.reports.route,
         SealedBottomNavItem.me.route
     )
-
-
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
@@ -42,9 +45,26 @@ fun AppNavHost(navHostController: NavHostController) {
             startDestination = SealedBottomNavItem.records.route,
             modifier = Modifier.padding(it)
         ) {
-            composable(Screens.records.route) {
-                ReportsScreen()
+            composable(SealedBottomNavItem.records.route) {
+               RecordScreen()
             }
+
+            composable(SealedBottomNavItem.charts.route) {
+                ChartScreen()
+            }
+
+            composable(SealedBottomNavItem.add.route) {
+                AddScreen()
+            }
+
+            composable(SealedBottomNavItem.reports.route) {
+                ReportScreen()
+            }
+            composable(SealedBottomNavItem.me.route) {
+                MeScreen()
+            }
+
+
         }
     }
 }

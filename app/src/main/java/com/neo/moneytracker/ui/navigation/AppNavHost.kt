@@ -1,20 +1,17 @@
 package com.neo.moneytracker.ui.navigation
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material.FabPosition
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
-import androidx.navigation.NavHost
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.navArgument
+import androidx.navigation.NavHostController
 import com.neo.moneytracker.ui.components.BottomNavigationBar
+import com.neo.moneytracker.ui.components.FabAddButton
 import com.neo.moneytracker.ui.screens.AddScreen
 import com.neo.moneytracker.ui.screens.ChartScreen
 import com.neo.moneytracker.ui.screens.MeScreen
@@ -33,38 +30,32 @@ fun AppNavHost(navHostController: NavHostController) {
         SealedBottomNavItem.reports.route,
         SealedBottomNavItem.me.route
     )
+
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
                 BottomNavigationBar(navController = navHostController)
             }
-        }
-    ) {
+        },
+        floatingActionButton = {
+            if (showBottomBar) {
+                FabAddButton(navController = navHostController)
+            }
+        },
+        floatingActionButtonPosition = FabPosition.Center,
+        isFloatingActionButtonDocked = true
+    )
+    { paddingValues ->
         NavHost(
             navController = navHostController,
             startDestination = SealedBottomNavItem.records.route,
-            modifier = Modifier.padding(it)
+            modifier = Modifier.padding(paddingValues)
         ) {
-            composable(SealedBottomNavItem.records.route) {
-               RecordScreen()
-            }
-
-            composable(SealedBottomNavItem.charts.route) {
-                ChartScreen()
-            }
-
-            composable(SealedBottomNavItem.add.route) {
-                AddScreen()
-            }
-
-            composable(SealedBottomNavItem.reports.route) {
-                ReportScreen()
-            }
-            composable(SealedBottomNavItem.me.route) {
-                MeScreen()
-            }
-
-
+            composable(SealedBottomNavItem.records.route) { RecordScreen() }
+            composable(SealedBottomNavItem.charts.route) { ChartScreen() }
+            composable(SealedBottomNavItem.add.route) { AddScreen() }
+            composable(SealedBottomNavItem.reports.route) { ReportScreen() }
+            composable(SealedBottomNavItem.me.route) { MeScreen() }
         }
     }
 }

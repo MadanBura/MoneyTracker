@@ -18,8 +18,9 @@ import com.neo.moneytracker.ui.components.BottomNavigationBar
 import com.neo.moneytracker.ui.screens.AddScreen
 import com.neo.moneytracker.ui.screens.ChartScreen
 import com.neo.moneytracker.ui.screens.MeScreen
-import com.neo.moneytracker.ui.screens.RecordScreen
 import com.neo.moneytracker.ui.screens.ReportScreen
+import com.neo.moneytracker.ui.screens.RecordScreen
+
 
 @Composable
 fun AppNavHost(navHostController: NavHostController) {
@@ -46,7 +47,7 @@ fun AppNavHost(navHostController: NavHostController) {
             modifier = Modifier.padding(it)
         ) {
             composable(SealedBottomNavItem.records.route) {
-               RecordScreen()
+                RecordScreen()
             }
 
             composable(SealedBottomNavItem.charts.route) {
@@ -64,7 +65,7 @@ fun AppNavHost(navHostController: NavHostController) {
                 MeScreen()
             }
 
-
         }
     }
 }
+

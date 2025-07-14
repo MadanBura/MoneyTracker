@@ -11,10 +11,32 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.neo.moneytracker.ui.theme.MoneyTrackerTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+         installSplashScreen()
+             .setOnExitAnimationListener{ splashScreenView ->
+                 splashScreenView.view.animate()
+                     .alpha(0f)
+                     .setDuration(3000)
+                     .withEndAction {
+                         splashScreenView.remove()
+                     }
+                     .start()
+             }
+
+//        // Set exit animation
+//        splashScreen.setOnExitAnimationListener { splashScreenView ->
+//            splashScreenView.view.animate()
+//                .alpha(0f)
+//                .setDuration(3000L)
+//                .withEndAction {
+//                    splashScreenView.remove()
+//                }
+//                .start()
+//        }
         super.onCreate(savedInstanceState)
         setContent {
             MoneyTrackerTheme {

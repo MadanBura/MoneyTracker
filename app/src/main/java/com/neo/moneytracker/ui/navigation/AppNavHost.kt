@@ -53,7 +53,7 @@ fun AppNavHost(navHostController: NavHostController) {
         ) {
             composable(SealedBottomNavItem.records.route) { RecordScreen() }
             composable(SealedBottomNavItem.charts.route) { ChartScreen() }
-            composable(SealedBottomNavItem.add.route) { AddScreen() }
+            composable(SealedBottomNavItem.add.route) { AddScreen(navHostController) }
             composable(SealedBottomNavItem.reports.route) { ReportScreen() }
             composable(SealedBottomNavItem.me.route) { MeScreen() }
         }

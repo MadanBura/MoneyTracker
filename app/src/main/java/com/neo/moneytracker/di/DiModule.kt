@@ -1,10 +1,13 @@
 package com.neo.moneytracker.di
 
+import android.content.Context
 import com.neo.moneytracker.data.repoImpl.CategoryRepoImpl
 import com.neo.moneytracker.domain.repository.CategoryRepository
+import com.neo.moneytracker.domain.usecase.CategoryDataUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -14,7 +17,18 @@ class DiModule {
 
     @Provides
     @Singleton
-    fun provideUserModule(repo: CategoryRepoImpl): CategoryRepository {
-        return repo
+    fun provideCategoryRepository(
+        @ApplicationContext context: Context
+    ): CategoryRepository {
+        return CategoryRepoImpl(context)
     }
+
+    @Provides
+    @Singleton
+    fun provideCategoryDataUseCase(
+        repository: CategoryRepository
+    ): CategoryDataUseCase {
+        return CategoryDataUseCase(repository)
+    }
+
 }

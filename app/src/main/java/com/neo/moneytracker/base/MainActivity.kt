@@ -16,8 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import com.neo.moneytracker.ui.theme.MoneyTrackerTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
          installSplashScreen()
@@ -33,11 +36,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-//            MoneyTrackerTheme {
+            MoneyTrackerTheme {
             Scaffold(
                 modifier = Modifier
                     .fillMaxSize()
-                    .windowInsetsPadding(WindowInsets.systemBars), // 👈 add this
+                    .windowInsetsPadding(WindowInsets.systemBars),
                 content = { innerPadding ->
                     Column(modifier = Modifier.padding(innerPadding)) {
                         MoneyTracker()
@@ -45,7 +48,7 @@ class MainActivity : ComponentActivity() {
                 }
             )
 
-//            }
+            }
         }
     }
 }

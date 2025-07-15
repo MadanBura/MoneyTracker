@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,46 +24,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showSystemUi = true)
 @Composable
-fun StickyFirstWithLazyRow() {
-    val categories = listOf("Expenses", "Income", "Balance")
-    var showMonthPicker by remember { mutableStateOf(false) }
+fun HorizontalType() {
 
-    if (showMonthPicker) {
-        MonthYearPickerDialog(
-            onDismiss = { showMonthPicker = false },
-            onDateSelected = {
-                println("Selected Month: $it")
-                showMonthPicker = false
-            }
-        )
-    }
+    val categories = listOf("All","Expenses", "Income", "Transfer")
 
     Row(modifier = Modifier.fillMaxWidth()) {
 
         Box(
             modifier = Modifier
-                .background(Color(0xFFFFE44C))
+                .background(Color.White)
                 .padding(16.dp)
-                .clickable {
-                    showMonthPicker = true
-                }
+
         ) {
             Column {
-                Text("2025")
                 Row {
                     Text(
-                        text = "JUL",
+                        text = "Type",
                         color = Color.Black,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Menu Icon"
+                        style = MaterialTheme.typography.titleMedium
                     )
                 }
             }
@@ -70,22 +55,28 @@ fun StickyFirstWithLazyRow() {
 
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
+            horizontalArrangement = Arrangement.Start
+        ) {
             items(categories) { category ->
                 Box(
                     modifier = Modifier
-                        .padding(8.dp)
-                        .background(Color(0xFFFFE44C))
-                        .padding(0.dp)
-                ) {
+                        .padding(10.dp)
+                        .background(
+                            color = Color(0xFFFFE44C),
+                            shape = RoundedCornerShape(32.dp)
+                        )
+                        .padding(10.dp)
+                        .clickable {  }
+                )
+                {
                     Column {
-                        Text(category)
-                        Text("0")
-                    }
+                        Text(
+                            text = category,
+                            color = Color.Black,
+                            style = MaterialTheme.typography.bodyMedium
+                        )                    }
                 }
             }
         }
     }
 }
-

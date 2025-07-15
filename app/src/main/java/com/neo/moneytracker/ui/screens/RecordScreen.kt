@@ -28,14 +28,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.neo.moneytracker.ui.components.CalendarPickerButton
 import com.neo.moneytracker.ui.components.SearchBox
+import com.neo.moneytracker.ui.components.SearchSpec
 import com.neo.moneytracker.ui.components.StickyFirstWithLazyRow
+import com.neo.moneytracker.ui.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview(showSystemUi = true)
-fun RecordScreen() {
+fun RecordScreen(
+    navController: NavHostController
+) {
     var showSearch by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -48,7 +53,7 @@ fun RecordScreen() {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { showSearch = true }) {
+                    IconButton(onClick = {navController.navigate(Screens.searchScreen.route) }) {
                         Icon(Icons.Default.Search, contentDescription = "Search")
                     }
 

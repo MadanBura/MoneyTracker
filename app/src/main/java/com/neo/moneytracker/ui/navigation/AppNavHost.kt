@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.neo.moneytracker.ui.components.BottomNavigationBar
+import com.neo.moneytracker.ui.components.SearchSpec
 import com.neo.moneytracker.ui.screens.AddScreen
 import com.neo.moneytracker.ui.screens.ChartScreen
 import com.neo.moneytracker.ui.screens.MeScreen
@@ -47,7 +48,14 @@ fun AppNavHost(navHostController: NavHostController) {
             modifier = Modifier.padding(it)
         ) {
             composable(SealedBottomNavItem.records.route) {
-                RecordScreen()
+                RecordScreen(
+                    navController = navHostController
+                )
+            }
+            composable(Screens.searchScreen.route) {
+                SearchSpec(
+                    navController = navHostController
+                )
             }
 
             composable(SealedBottomNavItem.charts.route) {

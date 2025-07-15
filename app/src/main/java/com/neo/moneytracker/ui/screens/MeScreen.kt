@@ -1,5 +1,6 @@
 package com.neo.moneytracker.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -17,32 +18,31 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowForwardIos
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.Block
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.neo.moneytracker.ui.components.BottomSheet
+import com.neo.moneytracker.ui.components.RatingDialogComp
 
 @Composable
 fun MeScreen() {
@@ -63,6 +63,9 @@ fun MeScreen() {
                 )
         ) { }
     }
+    var showBottomSheet by remember {
+        mutableStateOf(false)
+    }
 
     Box {
         Column(
@@ -70,15 +73,26 @@ fun MeScreen() {
                 .fillMaxSize()
 
         ) {
-            TopSection()
-            OptionList()
+            TopSection(onShowBottomSheet = { showBottomSheet = true })
+            OptionList(onShowBottomSheet = { showBottomSheet = true })
         }
+    }
+
+    if (showBottomSheet){
+        BottomSheet(
+            showBottomSheet,
+            onDismiss = {
+                showBottomSheet = false
+            }
+        )
     }
 }
 
 
 @Composable
-fun TopSection() {
+fun TopSection(
+    onShowBottomSheet: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -107,7 +121,9 @@ fun TopSection() {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White, shape = RoundedCornerShape(12.dp))
-                .clickable {},
+                .clickable {
+                    onShowBottomSheet()
+                },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -135,8 +151,11 @@ fun TopSection() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OptionList() {
+fun OptionList(
+    onShowBottomSheet: () -> Unit
+) {
     val options = listOf(
         "Recommend to friends" to Icons.Outlined.ThumbUp,
         "Rate the app" to Icons.Outlined.Edit,
@@ -150,11 +169,29 @@ fun OptionList() {
             .padding(16.dp)
             .background(Color.White, shape = RoundedCornerShape(20.dp))
     ) {
+        var showDialog by remember{
+            mutableStateOf(false)
+        }
+        val context = LocalContext.current
         options.forEachIndexed {index, (label, icon) ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {}
+                    .clickable {
+                        when(index){
+                            0 -> {
+                                val sendIntent = Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    type = "text/plain"
+                                }
+                                val shareIntent = Intent.createChooser(sendIntent, "Share via")
+                                context.startActivity(shareIntent)
+                            }
+                            1 -> showDialog = true
+                            2 -> onShowBottomSheet()
+                            3 -> {}
+                        }
+                    }
                     .padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -180,6 +217,12 @@ fun OptionList() {
                         .align(Alignment.CenterHorizontally)
                 )
             }
+        }
+
+        if(showDialog){
+            RatingDialogComp(onDismiss = {
+                showDialog = false
+            })
         }
     }
 }

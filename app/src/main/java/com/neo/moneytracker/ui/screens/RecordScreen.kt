@@ -1,89 +1,157 @@
 package com.neo.moneytracker.ui.screens
 
-import android.provider.CalendarContract.Colors
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.neo.moneytracker.R
 import com.neo.moneytracker.ui.components.CalendarPickerButton
 import com.neo.moneytracker.ui.components.SearchBox
 import com.neo.moneytracker.ui.components.SearchSpec
 import com.neo.moneytracker.ui.components.StickyFirstWithLazyRow
 import com.neo.moneytracker.ui.navigation.Screens
-
+import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecordScreen(
-    navController: NavHostController
-) {
-    var showSearch by remember { mutableStateOf(false) }
+fun RecordScreen(navController: NavHostController) {
+    var isDrawerOpen by remember { mutableStateOf(false) }
+    var selectedBook by remember { mutableStateOf("Default") }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Money Tracker") },
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle navigation icon click */ }) {
+                    IconButton(onClick = {
+                        isDrawerOpen = !isDrawerOpen
+                    }) {
                         Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
                 },
                 actions = {
-                    IconButton(onClick = {navController.navigate(Screens.searchScreen.route) }) {
+                    IconButton(onClick = {
+                        navController.navigate(Screens.searchScreen.route)
+                    }) {
                         Icon(Icons.Default.Search, contentDescription = "Search")
                     }
-
-
                     CalendarPickerButton()
-
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color(0xFFFFE44C),
-                    titleContentColor = Color.Black,    // Optional: Title text color
+                    titleContentColor = Color.Black,
                     navigationIconContentColor = Color.Black,
                     actionIconContentColor = Color.Black
-
                 )
-
             )
         },
-        content = {paddingValues ->
-            Column(
+        content = { paddingValues ->
+            Row(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(0.dp)
             ) {
-                Box(
+                if (isDrawerOpen) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(350.dp)
+                            .background(Color.White)
+                            .padding(16.dp)
+                    ) {
+                        val drawerItems = listOf(
+                            Triple("Default", "Personal cash book", false),
+                            Triple("Team cash book", "Share with multiple people", true),
+                            Triple("Business cash book", "Suitable for business use", true)
+                        )
+
+                        drawerItems.forEach { (title, subtitle, isVp) ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        selectedBook = title
+                                        isDrawerOpen = false
+                                    }
+                                    .padding(vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(imageVector = Icons.Default.Book, contentDescription = null)
+                                Spacer(Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(title, fontWeight = FontWeight.Bold)
+                                    Text(subtitle, fontSize = 12.sp, color = Color.Gray)
+                                }
+                                if (isVp) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text("V/P", color = Color(0xFFFFC107), fontSize = 10.sp)
+                                        Spacer(Modifier.width(4.dp))
+                                        Icon(Icons.Default.Lock, contentDescription = "Locked", tint = Color.Gray)
+                                    }
+                                } else if (title == selectedBook) {
+                                    Icon(Icons.Default.Check, contentDescription = "Selected", tint = Color.Black)
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Button(
+                                onClick = { },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray,contentColor = Color.Black),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.weight(1f).padding(end = 8.dp)
+                            ) {
+                                Text("Add")
+                                Text(" V/P", color = Color(0xFFFFC107))
+                            }
+
+                            Button(
+                                onClick = { /* Join logic */ },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray, contentColor = Color.Black),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Join")
+                            }
+                        }
+                    }
+                }
+
+                Column(
                     modifier = Modifier
-                        .background(Color(0xFFFFE44C))
-                        .padding(0.dp)
+                        .fillMaxSize()
+                        .background(Color.White)
                 ) {
-                    StickyFirstWithLazyRow()
+                    Box(
+                        modifier = Modifier
+                            .background(Color(0xFFFFE44C))
+                            .fillMaxWidth()
+                    ) {
+                        StickyFirstWithLazyRow()
+                    }
                 }
             }
         }

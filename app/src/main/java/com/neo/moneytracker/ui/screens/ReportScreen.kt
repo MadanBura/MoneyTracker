@@ -71,6 +71,10 @@ fun ReportScreen() {
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             // Main screen content below tabs
+            when(selectedTab){
+                "Analytics" -> AnalyticsScreen()
+                "Accouts" -> {}
+            }
         }
     }
 }

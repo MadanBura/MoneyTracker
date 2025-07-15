@@ -73,7 +73,7 @@ fun ReportScreen() {
             // Main screen content below tabs
             when(selectedTab){
                 "Analytics" -> AnalyticsScreen()
-                "Accouts" -> {}
+                "Accounts" -> AccountsScreen()
             }
         }
     }

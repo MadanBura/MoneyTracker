@@ -2,6 +2,7 @@ package com.neo.moneytracker.ui.screens
 
 import android.content.Intent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -123,7 +124,8 @@ fun TopSection(
                 .background(Color.White, shape = RoundedCornerShape(12.dp))
                 .clickable {
                     onShowBottomSheet()
-                },
+                }
+                .border(1.dp, Color.LightGray, RoundedCornerShape(10.dp)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -168,6 +170,7 @@ fun OptionList(
             .fillMaxWidth()
             .padding(16.dp)
             .background(Color.White, shape = RoundedCornerShape(20.dp))
+            .border(1.dp, Color.LightGray, RoundedCornerShape(10.dp))
     ) {
         var showDialog by remember{
             mutableStateOf(false)

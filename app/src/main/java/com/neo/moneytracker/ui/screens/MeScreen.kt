@@ -1,5 +1,6 @@
 package com.neo.moneytracker.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -43,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -158,16 +160,24 @@ fun OptionList() {
         var showDialog by remember{
             mutableStateOf(false)
         }
+        val context = LocalContext.current
         options.forEachIndexed {index, (label, icon) ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
                         when(index){
+                            0 -> {
+                                val sendIntent = Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    type = "text/plain"
+                                }
+                                val shareIntent = Intent.createChooser(sendIntent, "Share via")
+                                context.startActivity(shareIntent)
+                            }
                             1 -> showDialog = true
                             2 -> {}
                             3 -> {}
-                            4 -> {}
                         }
                     }
                     .padding(20.dp),

@@ -34,6 +34,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -43,6 +47,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.neo.moneytracker.ui.components.RatingDialogComp
 
 @Composable
 fun MeScreen() {
@@ -150,11 +155,21 @@ fun OptionList() {
             .padding(16.dp)
             .background(Color.White, shape = RoundedCornerShape(20.dp))
     ) {
+        var showDialog by remember{
+            mutableStateOf(false)
+        }
         options.forEachIndexed {index, (label, icon) ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {}
+                    .clickable {
+                        when(index){
+                            1 -> showDialog = true
+                            2 -> {}
+                            3 -> {}
+                            4 -> {}
+                        }
+                    }
                     .padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -180,6 +195,12 @@ fun OptionList() {
                         .align(Alignment.CenterHorizontally)
                 )
             }
+        }
+
+        if(showDialog){
+            RatingDialogComp(onDismiss = {
+                showDialog = false
+            })
         }
     }
 }

@@ -24,8 +24,8 @@ class AccountRepositoryImpl @Inject constructor(
          ))
     }
 
-    override suspend fun getAccount(): Flow<List<AddAccountEntity>>  = flow{
-        emit(addAccount.getAccountDetails())
+    override suspend fun getAccount(): Flow<List<AddAccountEntity>> {
+        return addAccount.getAccountDetails()
     }
 
     override suspend fun deleteAccount(id: Int) {

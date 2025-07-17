@@ -24,6 +24,10 @@ class AccountsViewModel @Inject constructor(
             repo.addAccount(account)
         }
     }
+
+    init {
+        getAccounts()
+    }
     private val _accounts = MutableStateFlow<List<AddAccountEntity>>(emptyList())
     val accounts: StateFlow<List<AddAccountEntity>> = _accounts
 
@@ -34,6 +38,7 @@ class AccountsViewModel @Inject constructor(
             }
         }
     }
+
     fun delAccount(account: AddAccountEntity){
         viewModelScope.launch{
             repo.deleteAccount(id = account.id)

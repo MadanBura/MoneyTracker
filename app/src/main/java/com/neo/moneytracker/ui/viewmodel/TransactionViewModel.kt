@@ -17,6 +17,7 @@ class TransactionViewModel @Inject constructor(private val transactionRepository
 
 //  Sharing is started when the first subscriber appears and never stops.
     //stateIn-> It start on given coroutineScope,
+
     val transactions: StateFlow<List<TransactionEntity>> = transactionRepository.getAllTransaction()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 

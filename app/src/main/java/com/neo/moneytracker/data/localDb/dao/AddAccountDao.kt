@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.neo.moneytracker.data.localDb.entities.AddAccountEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AddAccountDao {
@@ -13,7 +14,7 @@ interface AddAccountDao {
     suspend fun insertAccount(account: AddAccountEntity)
 
     @Query("Select * from AddAccount")
-    suspend fun getAccountDetails(): List<AddAccountEntity>
+    fun getAccountDetails(): Flow<List<AddAccountEntity>>
 
     @Query("Delete from AddAccount where id=:id")
     suspend fun deleteAccount(id: Int)

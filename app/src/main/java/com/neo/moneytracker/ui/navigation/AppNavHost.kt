@@ -99,7 +99,7 @@ fun AppNavHost(navHostController: NavHostController) {
                 AddAccountScreen(navHostController, accountViewModel)
             }
             composable(Screens.manageAccount.route) {
-                ManageAccounts()
+                ManageAccounts(accountViewModel,navHostController)
             }
         }
     }

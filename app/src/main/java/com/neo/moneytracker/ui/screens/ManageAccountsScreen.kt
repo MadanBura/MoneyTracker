@@ -1,7 +1,9 @@
 package com.neo.moneytracker.ui.screens
 
+import android.util.Log
 import android.widget.Space
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -12,6 +14,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
@@ -23,14 +26,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.neo.moneytracker.R
+import com.neo.moneytracker.ui.navigation.Screens
 import com.neo.moneytracker.ui.theme.LemonSecondary
 import com.neo.moneytracker.ui.theme.YellowOrange
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 
-@Preview(showSystemUi = true)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ManageAccounts() {
-    val items = listOf("Cash")
+fun ManageAccounts(
+    addAccountViewModel:AccountsViewModel,
+    navController: NavHostController
+) {
+
+    val list = addAccountViewModel.accounts.collectAsState().value
+
+
+    Log.d("HELLO", list.toString())
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -43,7 +54,7 @@ fun ManageAccounts() {
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-//                        navHostController.popBackStack()
+                        navController.popBackStack()
                     }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
@@ -69,7 +80,7 @@ fun ManageAccounts() {
                     .fillMaxSize()
                     .padding(bottom = 70.dp)
             ) {
-                items(items.size) { index ->
+                items(list.size) { index ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -79,7 +90,10 @@ fun ManageAccounts() {
                         Icon(
                             imageVector = Icons.Filled.DoNotDisturbOn,
                             contentDescription = null,
-                            tint = Color.Red
+                            tint = Color.Red,
+                            modifier = Modifier.clickable {
+                                addAccountViewModel.delAccount(list[index])
+                            }
                         )
 
                         Icon(
@@ -93,12 +107,12 @@ fun ManageAccounts() {
 
                         Column {
                             Text(
-                                text = items[index],
+                                text = list[index].accountName,
                                 modifier = Modifier.padding(start = 10.dp),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                             Text(
-                                text = items[index],
+                                text = list[index].note,
                                 modifier = Modifier.padding(start = 10.dp),
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -129,7 +143,9 @@ fun ManageAccounts() {
 
 
             Button(
-                onClick = { },
+                onClick = {
+                    navController.navigate(Screens.addAccount.route)
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = LemonSecondary,
                     contentColor = Color.Black,

@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.FabPosition
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -19,11 +21,20 @@ import com.neo.moneytracker.ui.screens.MeScreen
 import com.neo.moneytracker.ui.screens.ReportScreen
 import com.neo.moneytracker.ui.screens.RecordScreen
 
+import com.neo.moneytracker.ui.screens.SettingScreen
+import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
+import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
 
 @Composable
 fun AppNavHost(navHostController: NavHostController) {
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+
+    val uiStateViewModel: UiStateViewModel = hiltViewModel()
+    val transactionViewModel : TransactionViewModel = hiltViewModel()
+    val isDialogVisible by uiStateViewModel.isDialogVisible.collectAsState()
+
 
     val showBottomBar = currentRoute in listOf(
         SealedBottomNavItem.records.route,
@@ -31,7 +42,7 @@ fun AppNavHost(navHostController: NavHostController) {
         SealedBottomNavItem.add.route,
         SealedBottomNavItem.reports.route,
         SealedBottomNavItem.me.route
-    )
+    ) && !isDialogVisible
 
     Scaffold(
         bottomBar = {
@@ -77,6 +88,14 @@ fun AppNavHost(navHostController: NavHostController) {
             }
             composable(SealedBottomNavItem.me.route) {
                 MeScreen()
+            }
+            composable(SealedBottomNavItem.records.route) { RecordScreen() }
+            composable(SealedBottomNavItem.charts.route) { ChartScreen() }
+            composable(SealedBottomNavItem.add.route) { AddScreen(navHostController, uiStateViewModel, transactionViewModel) }
+            composable(SealedBottomNavItem.reports.route) { ReportScreen() }
+            composable(SealedBottomNavItem.me.route) { MeScreen() }
+            composable(Screens.settings.route){
+                SettingScreen()
             }
         }
     }

@@ -1,7 +1,9 @@
 package com.neo.moneytracker.ui.screens
 
+import android.widget.ImageButton
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -12,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -20,13 +21,19 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.neo.moneytracker.R
+import com.neo.moneytracker.ui.components.AmountInputDialog
+import com.neo.moneytracker.ui.components.BottomNavigationBar
 import com.neo.moneytracker.ui.components.SimpleTabLayoutforAdd
+import com.neo.moneytracker.ui.navigation.Screens
+import com.neo.moneytracker.ui.theme.IconBackGroundColor
 import com.neo.moneytracker.ui.theme.LemonSecondary
+import com.neo.moneytracker.ui.theme.YellowOrange
 import com.neo.moneytracker.ui.viewmodel.AddViewModel
-import com.neo.moneytracker.utils.ReaderHelper
+import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
+import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
 
 @Composable
-fun AddScreen(navController: NavController) {
+fun AddScreen(navController: NavController, uiStateViewModel: UiStateViewModel, transactionViewModel: TransactionViewModel) {
     val viewModel: AddViewModel = hiltViewModel()
     //    val context = LocalContext.current
     val categoryMap by viewModel.categoryMap
@@ -36,6 +43,10 @@ fun AddScreen(navController: NavController) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val selectedCategory = categories.getOrNull(selectedTabIndex) ?: return
 
+    var selectedItem by remember { mutableStateOf<String?>(null) }
+    var selectedIcon by remember { mutableStateOf<Int?>(null) }
+    val shouldShowBottomBar = selectedItem == null
+
     Scaffold(
         topBar = {
             Column(
@@ -43,75 +54,118 @@ fun AddScreen(navController: NavController) {
                     .background(LemonSecondary)
                     .padding(horizontal = 8.dp, vertical = 8.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                    TextButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.padding(start = 4.dp)
                     ) {
-                        TextButton(
-                            onClick = {
-                                navController.popBackStack()
-                            },
-                            modifier = Modifier.padding(start = 4.dp)
-                        ) {
-                            Text("Cancel", color = Color.Black)
-                        }
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        Text(
-                            text = "Add",
-                            color = Color.Black,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Spacer(modifier = Modifier.weight(1.75f))
+                        Text("Cancel", color = Color.Black)
                     }
-                }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = "Add",
+                        color = Color.Black,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Image(
+                        painter = painterResource(id = R.drawable.checklist),
+                        contentDescription = "Settings Icon",
+                        modifier = Modifier
+                            .size(30.dp)
+                            .padding(end = 8.dp)
+                    )
+                }
 
                 SimpleTabLayoutforAdd(
                     tabs = categories,
                     selectedIndex = selectedTabIndex,
-                    onTabSelected = { selectedTabIndex = it }
+                    onTabSelected = {
+                        selectedTabIndex = it
+                        selectedItem = null // Reset on tab change
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
             }
-        }
+        },
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .background(Color.White)
+        ) {
             val subWithIcons = categoryMap[selectedCategory] ?: emptyList()
-            SubcategoryGridScreen(subWithIcons)
+
+            // Scrollable container
+            Column(modifier = Modifier.weight(1f)) {
+                SubcategoryGridScreen(
+                    subWithIcons = subWithIcons,
+                    selectedItem = selectedItem
+                ) { clickedItem, iconRes ->
+                    if (clickedItem == "Settings") {
+                        navController.navigate(Screens.settings.route)
+                    } else {
+                        selectedItem = clickedItem
+                        selectedIcon = iconRes
+                    }
+                }
+            }
+
+            selectedItem?.let {
+                if (it != "Settings") {
+                    uiStateViewModel.setDialogVisible(true)
+                    AmountInputDialog(
+                        iconRes = selectedIcon!!,
+                        selectedCategory = it,
+                        transactionViewModel = transactionViewModel,
+                        navController=navController
+                        )
+                } else {
+                    navController.navigate(Screens.settings.route)
+                }
+            }
         }
     }
 }
 
 @Composable
-fun SubcategoryGridScreen(subWithIcons: List<Pair<String, Int>>) {
+fun SubcategoryGridScreen(
+    subWithIcons: List<Pair<String, Int>>,
+    selectedItem: String?,
+    onSubcategoryClick: (String, Int) -> Unit
+) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(4),
         contentPadding = PaddingValues(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxWidth()
     ) {
         items(subWithIcons) { (name, iconRes) ->
+            val isSelected = selectedItem == name
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(4.dp)
+                modifier = Modifier
+                    .padding(4.dp)
+                    .clickable { onSubcategoryClick(name, iconRes) }
             ) {
                 Box(
                     modifier = Modifier
                         .size(56.dp)
-                        .background(color = Color(0xFFE0E0E0), shape = CircleShape),
+                        .background(
+                            color = if (isSelected) LemonSecondary else IconBackGroundColor,
+                            shape = CircleShape
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(

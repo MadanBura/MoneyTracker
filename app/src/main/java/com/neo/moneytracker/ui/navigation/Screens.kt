@@ -5,6 +5,6 @@ sealed class Screens(val route: String) {
     object searchScreen : Screens("Search")
 
     object addAccount: Screens("AddAccount")
-    object manageAccount: Screens("ManageAccount")
+    object manageAccount: Screens("manageAccount")
 
 }

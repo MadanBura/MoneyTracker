@@ -1,5 +1,7 @@
 package com.neo.moneytracker.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.FabPosition
 import androidx.compose.material.Scaffold
@@ -20,6 +22,7 @@ import com.neo.moneytracker.ui.screens.ReportScreen
 import com.neo.moneytracker.ui.screens.RecordScreen
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(navHostController: NavHostController) {
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()

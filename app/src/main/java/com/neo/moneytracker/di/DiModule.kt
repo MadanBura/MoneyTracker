@@ -1,6 +1,7 @@
 package com.neo.moneytracker.di
 
 import android.content.Context
+import com.neo.moneytracker.data.localDb.dao.TransactionDao
 import com.neo.moneytracker.data.repoImpl.CategoryRepoImpl
 import com.neo.moneytracker.domain.repository.CategoryRepository
 import com.neo.moneytracker.domain.usecase.CategoryDataUseCase
@@ -30,5 +31,13 @@ class DiModule {
     ): CategoryDataUseCase {
         return CategoryDataUseCase(repository)
     }
+
+    @Provides
+    @Singleton
+    fun providesTransactionRepository(transactionDao: TransactionDao):AddressRepository{
+        return AddressRepoImpl(addressDao)
+    }
+
+
 
 }

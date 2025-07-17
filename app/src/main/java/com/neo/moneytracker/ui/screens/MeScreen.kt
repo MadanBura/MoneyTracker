@@ -89,7 +89,6 @@ fun MeScreen() {
     }
 }
 
-
 @Composable
 fun TopSection(
     onShowBottomSheet: () -> Unit

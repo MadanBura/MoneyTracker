@@ -39,7 +39,4 @@ class DiModule {
     fun providesTransactionRepository(transactionDao: TransactionDao):TransactionRepository{
         return TransactionImpl(transactionDao)
     }
-
-
-
 }

@@ -4,6 +4,7 @@ import com.neo.moneytracker.data.localDb.dao.TransactionDao
 import com.neo.moneytracker.data.localDb.dbHelper.AppDatabase
 import android.app.Application
 import androidx.room.Room
+import com.neo.moneytracker.data.localDb.dao.AddAccountDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,4 +33,9 @@ object DatabaseModule {
         return database.transactionDao()
     }
 
+    @Provides
+    @Singleton
+    fun provideAccountDao(database: AppDatabase): AddAccountDao{
+        return database.addAccountDao()
+    }
 }

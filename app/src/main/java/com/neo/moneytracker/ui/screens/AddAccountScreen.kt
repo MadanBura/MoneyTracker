@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -20,17 +18,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.CreditCard
-import androidx.compose.material.icons.filled.EuroSymbol
-import androidx.compose.material.icons.filled.Money
-import androidx.compose.material.icons.filled.Payment
-import androidx.compose.material.icons.filled.Percent
-import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -47,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,15 +44,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.neo.moneytracker.R
+import com.neo.moneytracker.domain.model.AddAccount
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddAccountScreen(
     navController: NavController,
+    accountViewModel: AccountsViewModel,
     modifier: Modifier = Modifier
 ) {
     val accountName = remember { mutableStateOf("") }
@@ -71,8 +66,18 @@ fun AddAccountScreen(
     val selectedType = remember { mutableStateOf("Default") }
     val selectedCurrency = remember { mutableStateOf("INR (₹) Indian Rupee") }
     val selectedIcon = remember { mutableStateOf(0) }
+    val accountNote = remember { mutableStateOf("") }
 
-    val types = listOf("Default", "Savings", "Credit") // Sample types
+    val types = listOf(
+        "Default",
+        "Cash",
+        "Debit Card",
+        "Credit Card (Liabilities)",
+        "Virtual account",
+        "Investment",
+        "Owes me/ Receivables",
+        "I owe / Payables (Liabilities)"
+    )
     val currencies = listOf("INR (₹) Indian Rupee", "USD ($) US Dollar", "EUR (€) Euro")
 
     val icons = listOf(
@@ -92,6 +97,12 @@ fun AddAccountScreen(
         R.drawable.piggy_bank,
         R.drawable.safe
     )
+
+    val liabilityTypes = setOf(
+        "Credit Card (Liabilities)",
+        "I owe / Payables (Liabilities)"
+    )
+    val liabilities= selectedType.value in liabilityTypes
 
     Scaffold(
         topBar = {
@@ -116,7 +127,23 @@ fun AddAccountScreen(
                     )
                 },
                 actions = {
-                    IconButton(onClick = { /* Save action */ }) {
+                    IconButton(onClick = {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            accountViewModel.addAccount(
+                                AddAccount(
+                                    accountName = accountName.value,
+                                    type = selectedType.value,
+                                    currency = selectedCurrency.value,
+                                    amount = amount.value.toLong(),
+                                    icon = selectedIcon.value,
+                                    liabilities = liabilities,
+                                    note = accountNote.value
+                                )
+                            )
+                            delay(1000)
+                            navController.popBackStack()
+                        }
+                    }) {
                         Icon(Icons.Default.Check, contentDescription = "Save")
                     }
                 },
@@ -195,8 +222,10 @@ fun AddAccountScreen(
             }
 
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = accountNote.value,
+                onValueChange = {
+                    accountNote.value = it
+                },
                 label = { Text("Note") },
                 modifier = Modifier.fillMaxWidth()
             )

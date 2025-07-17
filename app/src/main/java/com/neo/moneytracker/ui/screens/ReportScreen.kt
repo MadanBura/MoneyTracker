@@ -36,7 +36,6 @@ import androidx.navigation.NavHostController
 import com.neo.moneytracker.ui.components.SimpleTabLayout
 import com.neo.moneytracker.ui.theme.LemonSecondary
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showSystemUi = true)
 @Composable
 fun ReportScreen(
     navController: NavHostController

@@ -25,10 +25,9 @@ import com.neo.moneytracker.ui.screens.MeScreen
 import com.neo.moneytracker.ui.screens.ReportScreen
 import com.neo.moneytracker.ui.screens.RecordScreen
 
-import com.neo.moneytracker.ui.screens.SettingScreen
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
-import java.util.concurrent.ForkJoinPool.ManagedBlocker
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -41,6 +40,7 @@ fun AppNavHost(navHostController: NavHostController) {
     val transactionViewModel : TransactionViewModel = hiltViewModel()
     val isDialogVisible by uiStateViewModel.isDialogVisible.collectAsState()
 
+    val accountViewModel: AccountsViewModel = hiltViewModel()
 
     val showBottomBar = currentRoute in listOf(
         SealedBottomNavItem.records.route,
@@ -96,7 +96,7 @@ fun AppNavHost(navHostController: NavHostController) {
                 MeScreen()
             }
             composable(Screens.addAccount.route) {
-                AddAccountScreen(navHostController)
+                AddAccountScreen(navHostController, accountViewModel)
             }
             composable(Screens.manageAccount.route) {
                 ManageAccounts(navHostController)

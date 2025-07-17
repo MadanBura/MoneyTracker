@@ -27,13 +27,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.neo.moneytracker.R
+import com.neo.moneytracker.ui.navigation.Screens
 import com.neo.moneytracker.ui.theme.LemonPrimary
 import com.neo.moneytracker.ui.theme.LemonSecondary
 import com.neo.moneytracker.ui.theme.YellowOrange
 
 @Composable
-fun AccountsScreen(modifier: Modifier = Modifier) {
+fun AccountsScreen(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
@@ -84,20 +89,30 @@ fun AccountsScreen(modifier: Modifier = Modifier) {
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        AccountButton("Add Account", modifier = Modifier.weight(1f))
-        AccountButton("Manage Accounts", modifier = Modifier.weight(1f))
+        AccountButton(
+            "Add Account",
+            modifier = Modifier.weight(1f),
+            onClick = {
+                navController.navigate(Screens.addAccount.route)
+            }
+        )
+        AccountButton(
+            "Manage Accounts",
+            modifier = Modifier.weight(1f),
+            onClick = {}
+        )
     }
 }
-
 
 
 @Composable
 fun AccountButton(
     text: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Button(
-        onClick = {  },
+        onClick = { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Color.LightGray),

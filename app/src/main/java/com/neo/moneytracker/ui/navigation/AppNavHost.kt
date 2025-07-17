@@ -20,6 +20,7 @@ import com.neo.moneytracker.ui.components.SearchSpec
 import com.neo.moneytracker.ui.screens.AddAccountScreen
 import com.neo.moneytracker.ui.screens.AddScreen
 import com.neo.moneytracker.ui.screens.ChartScreen
+import com.neo.moneytracker.ui.screens.ManageAccounts
 import com.neo.moneytracker.ui.screens.MeScreen
 import com.neo.moneytracker.ui.screens.ReportScreen
 import com.neo.moneytracker.ui.screens.RecordScreen
@@ -27,6 +28,7 @@ import com.neo.moneytracker.ui.screens.RecordScreen
 import com.neo.moneytracker.ui.screens.SettingScreen
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
+import java.util.concurrent.ForkJoinPool.ManagedBlocker
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -84,7 +86,7 @@ fun AppNavHost(navHostController: NavHostController) {
             }
 
             composable(SealedBottomNavItem.add.route) {
-                AddScreen(navHostController)
+                AddScreen(navHostController, uiStateViewModel, transactionViewModel)
             }
 
             composable(SealedBottomNavItem.reports.route) {
@@ -95,6 +97,9 @@ fun AppNavHost(navHostController: NavHostController) {
             }
             composable(Screens.addAccount.route) {
                 AddAccountScreen(navHostController)
+            }
+            composable(Screens.addAccount.route) {
+                ManageAccounts()
             }
         }
     }

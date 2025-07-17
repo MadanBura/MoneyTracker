@@ -99,7 +99,7 @@ fun AccountsScreen(
         AccountButton(
             "Manage Accounts",
             modifier = Modifier.weight(1f),
-            onClick = {}
+            onClick = { navController.navigate(Screens.manageAccount.route)}
         )
     }
 }

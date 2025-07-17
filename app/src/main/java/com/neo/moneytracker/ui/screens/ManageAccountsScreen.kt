@@ -13,12 +13,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.neo.moneytracker.ui.theme.YellowOrange
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showSystemUi = true)
 @Composable
-fun ManageAccounts() {
+fun ManageAccounts(navHostController: NavHostController) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -31,7 +31,7 @@ fun ManageAccounts() {
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        // Handle back navigation here
+                        navHostController.popBackStack()
                     }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
@@ -61,7 +61,7 @@ fun ManageAccounts() {
                     contentColor = Color.Black,
                     disabledContainerColor = Color.LightGray
                 ),
-                shape = RectangleShape, // Removes rounded corners
+                shape = RectangleShape,
                 modifier = Modifier
                     .padding(15.dp)
                     .fillMaxWidth()

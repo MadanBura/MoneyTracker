@@ -7,6 +7,8 @@ import com.neo.moneytracker.domain.repository.CategoryRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import com.neo.moneytracker.R
+import com.neo.moneytracker.domain.model.Category
+import com.neo.moneytracker.domain.model.SubCategory
 import java.io.InputStreamReader
 
 class CategoryRepoImpl @Inject constructor(
@@ -17,22 +19,54 @@ class CategoryRepoImpl @Inject constructor(
         val reader = InputStreamReader(inputStream)
         val data = Gson().fromJson(reader, CategoryData::class.java)
 
-        return CategoryData(
-            income = data.income.map { category ->
-                category.copy(subcategories = category.subcategories.map {
-                    it.copy(iconResId = getIconResId(it.icon))
-                })
-            },
-            expenses = data.expenses.map { category ->
-                category.copy(subcategories = category.subcategories.map {
-                    it.copy(iconResId = getIconResId(it.icon))
-                })
-            },
-            transfer = data.transfer.map { category ->
-                category.copy(subcategories = category.subcategories.map {
-                    it.copy(iconResId = getIconResId(it.icon))
-                })
+        val incomeSubcategories = data.income.flatMap { category ->
+            category.subcategories.map {
+                it.copy(iconResId = getIconResId(it.icon))
             }
+        }.toMutableList()
+
+        val expenseSubcategories = data.expenses.flatMap { category ->
+            category.subcategories.map {
+                it.copy(iconResId = getIconResId(it.icon))
+            }
+        }.toMutableList()
+
+        val transferSubcategories = data.transfer.flatMap { category ->
+            category.subcategories.map {
+                it.copy(iconResId = getIconResId(it.icon))
+            }
+        }.toMutableList()
+
+        val settingsSubcategory = SubCategory(
+            name = "Settings",
+            icon = "settings",
+            iconResId = getIconResId("settings")
+        )
+
+        // Add Settings once per category type
+        incomeSubcategories.add(settingsSubcategory)
+        expenseSubcategories.add(settingsSubcategory)
+        transferSubcategories.add(settingsSubcategory)
+
+        return CategoryData(
+            income = listOf(
+                Category(
+                    name = "Income",
+                    subcategories = incomeSubcategories
+                )
+            ),
+            expenses = listOf(
+               Category(
+                    name = "Expenses",
+                    subcategories = expenseSubcategories
+                )
+            ),
+            transfer = listOf(
+                    Category(
+                    name = "Transfer",
+                    subcategories = transferSubcategories
+                )
+            )
         )
     }
 

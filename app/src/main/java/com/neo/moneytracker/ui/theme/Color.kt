@@ -17,3 +17,5 @@ val LemonSurface = Color(0xFFFFF9C4)        // Soft lemon surface
 val OnSurface = Color(0xFF212121)
 
 val ErrorColor = Color(0xFFB00020)
+
+val IconBackGroundColor = Color(0xFFE0E0E0)

@@ -31,11 +31,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.neo.moneytracker.ui.components.SimpleTabLayout
 import com.neo.moneytracker.ui.theme.LemonSecondary
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportScreen() {
+fun ReportScreen(
+    navController: NavHostController
+) {
 
     var selectedTab by remember { mutableStateOf("Analytics") }
 
@@ -73,7 +76,7 @@ fun ReportScreen() {
             // Main screen content below tabs
             when(selectedTab){
                 "Analytics" -> AnalyticsScreen()
-                "Accounts" -> AccountsScreen()
+                "Accounts" -> AccountsScreen(navController)
             }
         }
     }

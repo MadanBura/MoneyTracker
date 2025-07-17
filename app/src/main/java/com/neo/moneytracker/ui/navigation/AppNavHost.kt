@@ -1,5 +1,7 @@
 package com.neo.moneytracker.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.FabPosition
 import androidx.compose.material.Scaffold
@@ -15,6 +17,7 @@ import androidx.navigation.NavHostController
 import com.neo.moneytracker.ui.components.BottomNavigationBar
 import com.neo.moneytracker.ui.components.FabAddButton
 import com.neo.moneytracker.ui.components.SearchSpec
+import com.neo.moneytracker.ui.screens.AddAccountScreen
 import com.neo.moneytracker.ui.screens.AddScreen
 import com.neo.moneytracker.ui.screens.ChartScreen
 import com.neo.moneytracker.ui.screens.MeScreen
@@ -25,6 +28,7 @@ import com.neo.moneytracker.ui.screens.SettingScreen
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(navHostController: NavHostController) {
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
@@ -84,18 +88,13 @@ fun AppNavHost(navHostController: NavHostController) {
             }
 
             composable(SealedBottomNavItem.reports.route) {
-                ReportScreen()
+                ReportScreen(navHostController)
             }
             composable(SealedBottomNavItem.me.route) {
                 MeScreen()
             }
-            composable(SealedBottomNavItem.records.route) { RecordScreen() }
-            composable(SealedBottomNavItem.charts.route) { ChartScreen() }
-            composable(SealedBottomNavItem.add.route) { AddScreen(navHostController, uiStateViewModel, transactionViewModel) }
-            composable(SealedBottomNavItem.reports.route) { ReportScreen() }
-            composable(SealedBottomNavItem.me.route) { MeScreen() }
-            composable(Screens.settings.route){
-                SettingScreen()
+            composable(Screens.addAccount.route) {
+                AddAccountScreen(navHostController)
             }
         }
     }

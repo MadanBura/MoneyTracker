@@ -91,7 +91,7 @@ fun AppNavHost(navHostController: NavHostController) {
             }
 
             composable(SealedBottomNavItem.add.route) {
-                AddScreen(navHostController, uiStateViewModel, transactionViewModel)
+                AddScreen(navHostController, uiStateViewModel, transactionViewModel, accountViewModel)
             }
 
             composable(SealedBottomNavItem.reports.route) {

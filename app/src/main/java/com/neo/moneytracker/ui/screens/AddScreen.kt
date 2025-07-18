@@ -2,16 +2,19 @@ package com.neo.moneytracker.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,6 +29,7 @@ import com.neo.moneytracker.ui.navigation.Screens
 import com.neo.moneytracker.ui.navigation.SealedBottomNavItem
 import com.neo.moneytracker.ui.theme.IconBackGroundColor
 import com.neo.moneytracker.ui.theme.LemonSecondary
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 import com.neo.moneytracker.ui.viewmodel.AddViewModel
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
@@ -34,7 +38,8 @@ import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
 fun AddScreen(
     navController: NavController,
     uiStateViewModel: UiStateViewModel,
-    transactionViewModel: TransactionViewModel
+    transactionViewModel: TransactionViewModel,
+    accountViewModel: AccountsViewModel
 ) {
     val viewModel: AddViewModel = hiltViewModel()
     //    val context = LocalContext.current
@@ -94,7 +99,13 @@ fun AddScreen(
                     onTabSelected = {
                         selectedTabIndex = it
                         selectedItem = null // Reset on tab change
-                    }
+                    },
+                    modifier = Modifier
+                        .height(40.dp)
+                        .background(color = LemonSecondary)
+                        .padding(horizontal = 16.dp, vertical = 2.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(1.dp, Color.Black, RoundedCornerShape(12.dp))
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
@@ -138,7 +149,8 @@ fun AddScreen(
                             uiStateViewModel.setDialogVisible(false)
                             selectedItem = null
                             navController.popBackStack(SealedBottomNavItem.records.route, inclusive = false)
-                        }
+                        },
+                        accountViewModel = accountViewModel
                     )
             }
         }

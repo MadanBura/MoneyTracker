@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.ads.mobile.sdk)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -63,7 +64,7 @@ dependencies {
 
     //for system status bar
 
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
+//    implementation("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
 //    Navigation
     val nav_version = "2.9.0"
     implementation("androidx.navigation:navigation-compose:$nav_version")
@@ -112,12 +113,6 @@ dependencies {
 
 
 //    Google Fonts
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.0")
-
-    implementation ("com.google.maps.android:maps-compose:2.11.4")
-    implementation ("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.android.gms:play-services-location:21.0.1")
-
 
     implementation("androidx.core:core-splashscreen:1.0.0")
 

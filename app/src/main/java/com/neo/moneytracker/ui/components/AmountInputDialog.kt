@@ -1,5 +1,8 @@
 package com.neo.moneytracker.ui.components
 
+import ads_mobile_sdk.h6
+import android.accounts.Account
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -7,16 +10,33 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material3.*
 import androidx.compose.material.TextField
 import androidx.compose.material3.TextField as NewTextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Badge
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.material3.TextFieldDefaults as NewTextFieldDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -24,15 +44,21 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.window.Dialog
 import com.neo.moneytracker.R
+import com.neo.moneytracker.data.localDb.entities.AddAccountEntity
 import com.neo.moneytracker.data.localDb.entities.TransactionEntity
 import com.neo.moneytracker.data.mapper.toDataEntity
 import com.neo.moneytracker.domain.model.Transaction
 import com.neo.moneytracker.ui.theme.IconBackGroundColor
 import com.neo.moneytracker.ui.theme.LemonSecondary
+import com.neo.moneytracker.ui.theme.YellowOrange
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 import com.neo.moneytracker.utils.TransactionType
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -42,14 +68,26 @@ fun AmountInputDialog(
     selectedCategory: String,
     selectedSubCategory : String,
     transactionViewModel: TransactionViewModel,
+    accountViewModel: AccountsViewModel,
     onTransactionAdded: (TransactionEntity) -> Unit,
     onDismiss : ()->Unit
 ) {
     var note by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("0") }
+    var showCalendar by remember { mutableStateOf(false) }
+
+    val calendar = Calendar.getInstance()
+    var selectedDate by remember {
+        mutableStateOf(SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(calendar.time))
+    }
+
+
+    var bottomNavBool by remember{
+        mutableStateOf(false)
+    }
 
     val keypadButtons = listOf(
-        listOf("7", "8", "9", "Today"),
+        listOf("7", "8", "9", "Date"),
         listOf("4", "5", "6", "+"),
         listOf("1", "2", "3", "-"),
         listOf(".", "0", "⌫", "✔")
@@ -97,12 +135,31 @@ fun AmountInputDialog(
                         Image(
                             painter = painterResource(id = R.drawable.checklist),
                             contentDescription = "Settings Icon",
-                            modifier = Modifier.size(30.dp)
+                            modifier = Modifier.size(30.dp).clickable {
+                                bottomNavBool = true
+                            }
                         )
                     }
                 )
             }
 
+//            LaunchedEffect(Unit) {
+//                accountViewModel.getAccounts()
+//            }
+
+            val accountList =  accountViewModel.accounts.collectAsState().value
+
+            Log.d("HELLO_ACCOUNT_Amount", accountList.toString())
+
+            if(bottomNavBool){
+                AccountBottomSheet(
+                   accountList,
+                    bottomNavBool,
+                    onDismiss = {
+                        bottomNavBool = false
+                    }
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(
@@ -168,8 +225,8 @@ fun AmountInputDialog(
                                         amount = if (amount.length > 1) amount.dropLast(1) else "0"
                                     }
                                     "✔" -> { // Confirm transaction
-                                        val currentDate =
-                                            SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
+//                                        val currentDate =
+//                                            SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
 
                                         val transaction = when(selectedCategory){
                                             "expenses" ->{
@@ -177,7 +234,7 @@ fun AmountInputDialog(
                                                     iconRes = iconRes,
                                                     amount = amount,
                                                     note = note,
-                                                    date = currentDate,
+                                                    date = selectedDate,
                                                     category = selectedSubCategory,
                                                     type = TransactionType.EXPENSES.name
                                                 )
@@ -187,7 +244,7 @@ fun AmountInputDialog(
                                                     iconRes = iconRes,
                                                     amount = amount,
                                                     note = note,
-                                                    date = currentDate,
+                                                    date = selectedDate,
                                                     category = selectedSubCategory,
                                                     type = TransactionType.INCOME.name
                                                 )
@@ -199,8 +256,8 @@ fun AmountInputDialog(
                                         note = ""
                                         onDismiss()
                                     }
-                                    "Today" -> {
-
+                                    "Date" -> {
+                                        showCalendar = true
                                     }
                                     "." -> if (!amount.contains(".")) amount += "."
                                     else -> {
@@ -222,24 +279,20 @@ fun AmountInputDialog(
                             contentPadding = PaddingValues(0.dp)
                         ) {
                             when (label) {
-                                "Today" -> {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.calendar),
-                                            contentDescription = "Calendar Icon",
-                                            tint = Color(0xFFFFC107),
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Text(
-                                            text = label,
-                                            fontSize = 14.sp,
-                                            color = Color(0xFFFFC107),
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
+                                "Date" -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.calendar),
+                                        contentDescription = "Calendar Icon",
+                                        tint = Color(0xFFFFC107),
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Text(
+                                        text = selectedDate,
+                                        fontSize = 12.sp,
+                                        color = Color(0xFFFFC107),
+                                        textAlign = TextAlign.Center,
+                                        fontWeight = FontWeight.Medium
+                                    )
                                 }
                                 "✔" -> {
                                     Icon(
@@ -264,5 +317,159 @@ fun AmountInputDialog(
             }
         }
     }
+    if (showCalendar) {
+        Dialog(onDismissRequest = { showCalendar = false }) {
+            CustomCalendarDialog(
+                onDismiss = { showCalendar = false },
+                onDateSelected = { selected ->
+                    selectedDate = selected
+                }
+            )
+        }
+    }
 }
 
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AccountBottomSheet(
+    accountList: List<AddAccountEntity>,
+    showBottomSheet: Boolean,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
+
+
+    Log.d("HELLO_ACCOUNT", accountList.toString())
+    LaunchedEffect(showBottomSheet) {
+        if (showBottomSheet) {
+            sheetState.show()
+        } else {
+            sheetState.hide()
+        }
+    }
+
+    ModalBottomSheet(
+
+        sheetState = sheetState,
+        onDismissRequest = { onDismiss() },
+        dragHandle = null
+    ) {
+
+        Column(modifier = Modifier.padding(16.dp)) {
+
+            // Header Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.Default.Close, contentDescription = "Close")
+                }
+                Text(
+                    text = "Accounts",
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center
+                )
+                IconButton(onClick = {}) {
+                    Icon(Icons.Default.Settings, contentDescription = "Settings")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            accountList.forEach { account ->
+                Log.d("HELLO_ACCOUNT", account.toString())
+                AccountItem(
+                    account = account
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(5.dp)
+            ){
+
+
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(Color(0xFFFFD54F), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Outlined.Badge, contentDescription = null, tint = Color.Black)
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+
+                Text(
+                    "Not associated with any account",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f)
+                )
+
+                Icon(
+                    Icons.Filled.Check,
+                    contentDescription = "",
+                    tint = Color.Yellow
+                )
+
+
+            }
+
+            Spacer(modifier = Modifier.height(80.dp))
+
+            // Toggle Switch
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Text("Automatically pop up every time")
+////                Switch(checked = showAutoPopup, onCheckedChange = onAutoPopupToggle)
+//            }
+        }
+    }
+}
+
+
+@Composable
+fun AccountItem(
+    account: AddAccountEntity,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {  }
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .background(Color(0xFFFFD54F), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(painterResource(R.drawable.notfound), contentDescription = null, tint = Color.Black)
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(account.accountName, style = MaterialTheme.typography.bodyLarge)
+            if (account.note.isNotBlank()) {
+                Text(account.note, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+
+        Text(
+            text = if (account.amount < 0) "( I owe ) ${account.amount}"
+            else account.amount.toString(),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}

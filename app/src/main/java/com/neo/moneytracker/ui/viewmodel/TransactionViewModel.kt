@@ -32,25 +32,32 @@ class TransactionViewModel @Inject constructor(private val transactionRepository
         }
     }
 
-    val incomeTotalAmount: StateFlow<Double> = _transactions.map { transactions ->
+    val incomeTotalAmount: StateFlow<Int> = _transactions.map { transactions ->
         transactions
             .map { it.toDomainModel() }
             .filter { it.type == TransactionType.INCOME.name }
-            .sumOf { it.amount.toDouble() }
-    }.stateIn(viewModelScope, SharingStarted.Lazily, 0.0)
+            .sumOf { it.amount.toIntOrNull() ?: 0 }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, 0)
 
-    val expensesTotalAmount: StateFlow<Double> = _transactions.map { transactions ->
+    val expensesTotalAmount: StateFlow<Int> = _transactions.map { transactions ->
         transactions
             .map { it.toDomainModel() }
             .filter { it.type == TransactionType.EXPENSES.name }
-            .sumOf { it.amount.toDouble() }
-    }.stateIn(viewModelScope, SharingStarted.Lazily, 0.0)
-
+            .sumOf { it.amount.toIntOrNull() ?: 0 }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, 0)
 
     fun calculateTotalsForDate(date: String): Pair<Int, Int> {
         val filtered = transactions.value.filter { it.date == date }
-        val incomeTotal = filtered.filter { it.type == TransactionType.INCOME.name }.sumOf { it.amount.toInt() }
-        val expenseTotal = filtered.filter { it.type == TransactionType.EXPENSES.name }.sumOf { it.amount.toInt()}
+
+        val incomeTotal = filtered
+            .filter { it.type == TransactionType.INCOME.name }
+            .mapNotNull { it.amount.toIntOrNull() }.sum()
+
+        val expenseTotal = filtered
+            .filter { it.type == TransactionType.EXPENSES.name }
+            .mapNotNull { it.amount.toIntOrNull() }
+            .sum()
+
         return Pair(incomeTotal, expenseTotal)
     }
 

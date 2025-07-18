@@ -31,4 +31,20 @@ class AccountRepositoryImpl @Inject constructor(
     override suspend fun deleteAccount(id: Int) {
         addAccount.deleteAccount(id)
     }
+
+    override suspend fun updateAccount(account: AddAccount) {
+        addAccount.updateAccount(account = AddAccountEntity(
+            accountName = account.accountName,
+            type = account.type,
+            currency = account.currency,
+            amount = account.amount,
+            icon = account.icon,
+            liabilities = account.liabilities,
+            note = account.note
+        ))
+    }
+
+    override suspend fun getAccountById(id: Int): AddAccountEntity {
+        return addAccount.getAccountById(id)
+    }
 }

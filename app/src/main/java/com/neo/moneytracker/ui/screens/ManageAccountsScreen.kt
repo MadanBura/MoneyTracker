@@ -124,7 +124,11 @@ fun ManageAccounts(
                             ) {
                             Icon(
                                 imageVector = Icons.Filled.Edit,
-                                contentDescription = null
+                                contentDescription = null,
+                                modifier = Modifier.clickable {
+                                    val accountId = list[index].id
+                                    navController.navigate(Screens.editAccount.createRoute(accountId))
+                                }
                             )
                             Icon(
                                 imageVector = Icons.Filled.PushPin,

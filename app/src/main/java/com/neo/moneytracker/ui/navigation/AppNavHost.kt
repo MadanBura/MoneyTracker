@@ -14,12 +14,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.neo.moneytracker.ui.components.BottomNavigationBar
 import com.neo.moneytracker.ui.components.FabAddButton
 import com.neo.moneytracker.ui.components.SearchSpec
 import com.neo.moneytracker.ui.screens.AddAccountScreen
 import com.neo.moneytracker.ui.screens.AddScreen
 import com.neo.moneytracker.ui.screens.ChartScreen
+import com.neo.moneytracker.ui.screens.EditAccountScreen
 import com.neo.moneytracker.ui.screens.ManageAccounts
 import com.neo.moneytracker.ui.screens.MeScreen
 import com.neo.moneytracker.ui.screens.ReportScreen
@@ -100,6 +103,18 @@ fun AppNavHost(navHostController: NavHostController) {
             }
             composable(Screens.manageAccount.route) {
                 ManageAccounts(accountViewModel,navHostController)
+            }
+
+            composable(
+                route = "editAccount/{accountId}",
+                arguments = listOf(navArgument("accountId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val accountId = backStackEntry.arguments?.getInt("accountId") ?: 0
+                EditAccountScreen(
+                    navController = navHostController,
+                    accountViewModel = accountViewModel,
+                    accountId = accountId
+                )
             }
         }
     }

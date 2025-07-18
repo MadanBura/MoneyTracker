@@ -86,27 +86,8 @@ fun ManageCategoryScreen(navController: NavController) {
                 )
 
             }
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(Color.White)
-        ) {
-            ReorderableSubCategoryList(
-                subcategories = subcategories,
-                onDelete = { item ->
-                    viewModel.removeSubCategory(selectedCategory ?: "", item)
-                },
-                onEdit = { item ->
-                    // You can navigate or show dialog here
-                },
-                onReorder = { from, to ->
-                    viewModel.reorderSubCategory(selectedCategory ?: "", from, to)
-                }
-            )
-
+        },
+        bottomBar = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -136,6 +117,28 @@ fun ManageCategoryScreen(navController: NavController) {
                 }
 
             }
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(Color.White)
+        ) {
+            ReorderableSubCategoryList(
+                subcategories = subcategories,
+                onDelete = { item ->
+                    viewModel.removeSubCategory(selectedCategory ?: "", item)
+                },
+                onEdit = { item ->
+                    // You can navigate or show dialog here
+                },
+                onReorder = { from, to ->
+                    viewModel.reorderSubCategory(selectedCategory ?: "", from, to)
+                }
+            )
+
+
         }
     }
 }

@@ -7,5 +7,5 @@ import com.neo.moneytracker.data.localDb.entities.TransactionEntity
 
 @Database(entities = [TransactionEntity::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun transactionDao(): TransactionDao
+    abstract fun getTransactionDao(): TransactionDao
 }

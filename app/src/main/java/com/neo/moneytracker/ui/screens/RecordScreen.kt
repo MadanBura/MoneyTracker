@@ -3,38 +3,49 @@ package com.neo.moneytracker.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.neo.moneytracker.R
+import com.neo.moneytracker.data.mapper.toDomainModel
 import com.neo.moneytracker.ui.components.CalendarPickerButton
-import com.neo.moneytracker.ui.components.SearchBox
-import com.neo.moneytracker.ui.components.SearchSpec
+import com.neo.moneytracker.ui.components.DailySummaryRow
 import com.neo.moneytracker.ui.components.StickyFirstWithLazyRow
+import com.neo.moneytracker.ui.components.TransactionIcon
 import com.neo.moneytracker.ui.navigation.Screens
-import kotlinx.coroutines.launch
+import com.neo.moneytracker.ui.theme.LemonSecondary
+import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
+import com.neo.moneytracker.utils.TransactionType
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecordScreen(navController: NavHostController) {
+fun RecordScreen(navController: NavHostController, transactionViewModel: TransactionViewModel) {
     var isDrawerOpen by remember { mutableStateOf(false) }
     var selectedBook by remember { mutableStateOf("Default") }
+
+    val transactionList by transactionViewModel.transactions.collectAsState(initial = emptyList())
+
+    val groupedTransactions = transactionList.groupBy { transaction ->
+        transaction.date
+    }
+
+    val totalIncomeAmount = transactionViewModel.incomeTotalAmount.collectAsState()
+    var expenseAmount = transactionViewModel.expensesTotalAmount.collectAsState().value
 
     Scaffold(
         topBar = {
@@ -56,7 +67,7 @@ fun RecordScreen(navController: NavHostController) {
                     CalendarPickerButton()
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFFFFE44C),
+                    containerColor = LemonSecondary,
                     titleContentColor = Color.Black,
                     navigationIconContentColor = Color.Black,
                     actionIconContentColor = Color.Black
@@ -104,10 +115,18 @@ fun RecordScreen(navController: NavHostController) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text("V/P", color = Color(0xFFFFC107), fontSize = 10.sp)
                                         Spacer(Modifier.width(4.dp))
-                                        Icon(Icons.Default.Lock, contentDescription = "Locked", tint = Color.Gray)
+                                        Icon(
+                                            Icons.Default.Lock,
+                                            contentDescription = "Locked",
+                                            tint = Color.Gray
+                                        )
                                     }
                                 } else if (title == selectedBook) {
-                                    Icon(Icons.Default.Check, contentDescription = "Selected", tint = Color.Black)
+                                    Icon(
+                                        Icons.Default.Check,
+                                        contentDescription = "Selected",
+                                        tint = Color.Black
+                                    )
                                 }
                             }
                         }
@@ -120,9 +139,14 @@ fun RecordScreen(navController: NavHostController) {
                         ) {
                             Button(
                                 onClick = { },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray,contentColor = Color.Black),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.LightGray,
+                                    contentColor = Color.Black
+                                ),
                                 shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.weight(1f).padding(end = 8.dp)
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 8.dp)
                             ) {
                                 Text("Add")
                                 Text(" V/P", color = Color(0xFFFFC107))
@@ -130,7 +154,10 @@ fun RecordScreen(navController: NavHostController) {
 
                             Button(
                                 onClick = { /* Join logic */ },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray, contentColor = Color.Black),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.LightGray,
+                                    contentColor = Color.Black
+                                ),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.weight(1f)
                             ) {
@@ -147,10 +174,94 @@ fun RecordScreen(navController: NavHostController) {
                 ) {
                     Box(
                         modifier = Modifier
-                            .background(Color(0xFFFFE44C))
+                            .background(LemonSecondary)
                             .fillMaxWidth()
                     ) {
-                        StickyFirstWithLazyRow()
+                        StickyFirstWithLazyRow(
+                            expenseAmount = expenseAmount.toInt(),
+                            incomeAmount = totalIncomeAmount.value.toInt()
+                        )
+                    }
+
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxSize()
+                    ) {
+                        groupedTransactions.forEach { (date, transactionsList) ->
+                            item {
+//                                Row(
+//                                    modifier = Modifier
+//                                        .fillMaxWidth()
+//                                        .padding(top = 2.dp)
+//                                        .padding(8.dp),
+//                                    verticalAlignment = Alignment.CenterVertically,
+//                                    horizontalArrangement = Arrangement.SpaceBetween
+//                                ) {
+//                                    Text(
+//                                        text = date,
+//                                        fontSize = 14.sp,
+//                                        fontWeight = FontWeight.Bold
+//                                    )
+//
+//                                    Text(
+//                                        text = "Expenses: ${"%.2f".format(expenseAmount.toDouble())}", // Format to 2 decimal places
+//                                        fontSize = 12.sp,
+//                                        fontWeight = FontWeight.Bold,
+//                                        color = Color.Black
+//                                    )
+
+                                    DailySummaryRow(date, transactionViewModel)
+//                                }
+                                HorizontalDivider(
+                                    color = Color.LightGray,
+                                    thickness = 1.dp,
+                                    modifier = Modifier.padding(vertical = 8.dp)
+                                )
+
+                            }
+
+                            items(transactionsList) { transaction ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp)
+                                        .background(Color.White, shape = RoundedCornerShape(8.dp)),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    TransactionIcon(transaction.toDomainModel())
+
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(8.dp)
+                                    ) {
+                                        Text(
+                                            text = transaction.category,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.Black
+                                        )
+                                    }
+
+                                    Text(
+                                        text = "${transaction.amount}",
+                                        fontSize = 16.sp,
+                                        color = Color.Black,
+                                        modifier = Modifier
+                                            .padding(8.dp)
+                                    )
+
+
+                                }
+                                HorizontalDivider(
+                                    color = Color.LightGray,
+                                    thickness = 1.dp,
+                                    modifier = Modifier.padding(vertical = 1.dp)
+                                )
+
+                            }
+                        }
                     }
                 }
             }

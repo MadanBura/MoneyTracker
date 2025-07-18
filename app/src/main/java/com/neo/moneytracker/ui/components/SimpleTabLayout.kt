@@ -31,9 +31,9 @@ fun SimpleTabLayout(tabs: List<String>, onTabSelected: (String) -> Unit) {
 
     Row(
         modifier = Modifier
-            .wrapContentHeight()
+            .height(40.dp)
             .background(color = LemonSecondary)
-            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .padding(horizontal = 16.dp, vertical = 2.dp)
             .clip(RoundedCornerShape(12.dp))
             .border(1.dp, Color.Black, RoundedCornerShape(12.dp))
     ) {
@@ -48,7 +48,7 @@ fun SimpleTabLayout(tabs: List<String>, onTabSelected: (String) -> Unit) {
                         selectedTab = index
                         onTabSelected(tab) // callback
                     }
-                    .padding(vertical = 12.dp),
+                    .padding(6.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(

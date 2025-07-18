@@ -7,6 +7,7 @@ import androidx.compose.material.FabPosition
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -18,9 +19,11 @@ import com.neo.moneytracker.ui.components.BottomNavigationBar
 import com.neo.moneytracker.ui.components.FabAddButton
 import com.neo.moneytracker.ui.components.SearchSpec
 import com.neo.moneytracker.ui.screens.AddAccountScreen
+import com.neo.moneytracker.ui.screens.AddCategoryScreen
 import com.neo.moneytracker.ui.screens.AddScreen
 import com.neo.moneytracker.ui.screens.ChartScreen
 import com.neo.moneytracker.ui.screens.ManageAccounts
+import com.neo.moneytracker.ui.screens.ManageCategoryScreen
 import com.neo.moneytracker.ui.screens.MeScreen
 import com.neo.moneytracker.ui.screens.ReportScreen
 import com.neo.moneytracker.ui.screens.RecordScreen
@@ -29,6 +32,7 @@ import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(navHostController: NavHostController) {
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
@@ -101,6 +105,12 @@ fun AppNavHost(navHostController: NavHostController) {
             }
             composable(Screens.manageAccount.route) {
                 ManageAccounts(accountViewModel,navHostController)
+            }
+            composable(Screens.settings.route){
+                ManageCategoryScreen(navHostController)
+            }
+            composable(Screens.addCateogryScreen.route){
+                AddCategoryScreen()
             }
         }
     }

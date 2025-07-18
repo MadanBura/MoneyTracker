@@ -27,6 +27,14 @@ class AccountsViewModel @Inject constructor(
         }
     }
 
+    fun reorderAccounts(fromIndex: Int, toIndex: Int) {
+        val currentList = _accounts.value.toMutableList()
+        val movedItem = currentList.removeAt(fromIndex)
+        currentList.add(toIndex, movedItem)
+        _accounts.value = currentList
+    }
+
+
     init {
         getAccounts()
     }
@@ -37,6 +45,7 @@ class AccountsViewModel @Inject constructor(
         viewModelScope.launch {
             useCase.getAccount().collect { list ->
                 _accounts.value = list
+                calculateAssetsAndLiabilities(list)
             }
         }
     }
@@ -52,6 +61,29 @@ class AccountsViewModel @Inject constructor(
         viewModelScope.launch {
             useCase.update(account)
         }
+    }
+
+    private val _assets = MutableStateFlow(0L)
+    val assets: StateFlow<Long> = _assets
+
+    private val _liabilities = MutableStateFlow(0L)
+    val liabilities: StateFlow<Long> = _liabilities
+
+    val netWorth: StateFlow<Long> = MutableStateFlow(0L)
+
+    private fun calculateAssetsAndLiabilities(list: List<AddAccountEntity>) {
+        var assets = 0L
+        var liabilities = 0L
+        for (i in list) {
+            if (i.liabilities) {
+                liabilities += i.amount
+            } else {
+                assets += i.amount
+            }
+        }
+        _assets.value = assets
+        _liabilities.value = liabilities
+        (netWorth as MutableStateFlow).value = assets - liabilities
     }
 
     private val _singleAccount = MutableStateFlow<AddAccountEntity?>(null)

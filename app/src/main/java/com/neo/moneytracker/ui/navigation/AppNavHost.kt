@@ -32,7 +32,6 @@ import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(navHostController: NavHostController) {
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
@@ -93,7 +92,10 @@ fun AppNavHost(navHostController: NavHostController) {
             }
 
             composable(SealedBottomNavItem.reports.route) {
-                ReportScreen(navHostController)
+                ReportScreen(
+                    navHostController,
+                    accountViewModel
+                )
             }
             composable(SealedBottomNavItem.me.route) {
                 MeScreen()

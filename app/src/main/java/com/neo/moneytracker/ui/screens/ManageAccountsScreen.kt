@@ -1,7 +1,9 @@
 package com.neo.moneytracker.ui.screens
 
+import android.os.Build
 import android.util.Log
 import android.widget.Space
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -31,6 +33,7 @@ import com.neo.moneytracker.ui.theme.LemonSecondary
 import com.neo.moneytracker.ui.theme.YellowOrange
 import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageAccounts(
@@ -138,12 +141,8 @@ fun ManageAccounts(
                                 imageVector = Icons.Filled.Menu,
                                 contentDescription = null
                             )
+            ReorderableListScreen(addAccountViewModel)
 
-                        }
-                    }
-
-                }
-            }
 
 
             Button(

@@ -1,17 +1,21 @@
 package com.neo.moneytracker.ui.components
 
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
+import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.neo.moneytracker.domain.model.Transaction
 import kotlin.random.Random
 
@@ -22,6 +26,8 @@ fun TransactionIcon(transaction: Transaction) {
         Random.nextFloat(),
         Random.nextFloat()
     )
+
+    Log.d("HELLO", transaction.toString())
 
     val lightColor = randomColor.copy(
         red = randomColor.red + 0.2f,
@@ -38,8 +44,8 @@ fun TransactionIcon(transaction: Transaction) {
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            painter = painterResource(id = transaction.iconRes),
-            contentDescription = transaction.category,
+            painter = painterResource(transaction.iconRes),
+            contentDescription = "",
             modifier = Modifier.size(24.dp),
             tint = Color.White
         )

@@ -26,6 +26,7 @@ import com.neo.moneytracker.ui.navigation.Screens
 import com.neo.moneytracker.ui.navigation.SealedBottomNavItem
 import com.neo.moneytracker.ui.theme.IconBackGroundColor
 import com.neo.moneytracker.ui.theme.LemonSecondary
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 import com.neo.moneytracker.ui.viewmodel.AddViewModel
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
@@ -34,7 +35,8 @@ import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
 fun AddScreen(
     navController: NavController,
     uiStateViewModel: UiStateViewModel,
-    transactionViewModel: TransactionViewModel
+    transactionViewModel: TransactionViewModel,
+    accountViewModel: AccountsViewModel
 ) {
     val viewModel: AddViewModel = hiltViewModel()
     //    val context = LocalContext.current
@@ -138,7 +140,8 @@ fun AddScreen(
                             uiStateViewModel.setDialogVisible(false)
                             selectedItem = null
                             navController.popBackStack(SealedBottomNavItem.records.route, inclusive = false)
-                        }
+                        },
+                        accountViewModel = accountViewModel
                     )
             }
         }

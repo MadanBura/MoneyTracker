@@ -1,14 +1,12 @@
 package com.neo.moneytracker.ui.viewmodel
 
-import android.content.Context
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.neo.moneytracker.domain.usecase.CategoryDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import com.neo.moneytracker.R
-import dagger.hilt.android.qualifiers.ApplicationContext
+
 @HiltViewModel
 class AddViewModel @Inject constructor(
     private val categoryUseCase: CategoryDataUseCase
@@ -41,5 +39,26 @@ class AddViewModel @Inject constructor(
             "income" to income,
             "transfer" to transfer
         )
+    }
+
+    fun removeSubCategory(category: String, item: Pair<String, Int>) {
+        val updatedList = _categoryMap.value[category]?.toMutableList()?.apply {
+            remove(item)
+        }
+        if (updatedList != null) {
+            _categoryMap.value = _categoryMap.value.toMutableMap().apply {
+                this[category] = updatedList
+            }
+        }
+    }
+
+    fun reorderSubCategory(category: String, from: Int, to: Int) {
+        val currentList = _categoryMap.value[category]?.toMutableList() ?: return
+        val item = currentList.removeAt(from)
+        currentList.add(to, item)
+
+        _categoryMap.value = _categoryMap.value.toMutableMap().apply {
+            this[category] = currentList
+        }
     }
 }

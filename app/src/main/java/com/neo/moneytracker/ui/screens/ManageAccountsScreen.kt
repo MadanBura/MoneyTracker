@@ -74,7 +74,6 @@ fun ManageAccounts(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Scrollable list with bottom padding
             ReorderableListScreen(
                 addAccountViewModel = addAccountViewModel,
                 navController

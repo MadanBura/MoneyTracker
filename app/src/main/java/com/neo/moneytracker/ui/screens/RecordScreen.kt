@@ -190,29 +190,8 @@ fun RecordScreen(navController: NavHostController, transactionViewModel: Transac
                     ) {
                         groupedTransactions.forEach { (date, transactionsList) ->
                             item {
-//                                Row(
-//                                    modifier = Modifier
-//                                        .fillMaxWidth()
-//                                        .padding(top = 2.dp)
-//                                        .padding(8.dp),
-//                                    verticalAlignment = Alignment.CenterVertically,
-//                                    horizontalArrangement = Arrangement.SpaceBetween
-//                                ) {
-//                                    Text(
-//                                        text = date,
-//                                        fontSize = 14.sp,
-//                                        fontWeight = FontWeight.Bold
-//                                    )
-//
-//                                    Text(
-//                                        text = "Expenses: ${"%.2f".format(expenseAmount.toDouble())}", // Format to 2 decimal places
-//                                        fontSize = 12.sp,
-//                                        fontWeight = FontWeight.Bold,
-//                                        color = Color.Black
-//                                    )
 
-                                    DailySummaryRow(date, transactionViewModel)
-//                                }
+                                DailySummaryRow(date, transactionViewModel)
                                 HorizontalDivider(
                                     color = Color.LightGray,
                                     thickness = 1.dp,

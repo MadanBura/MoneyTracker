@@ -37,9 +37,9 @@ class AddViewModel @Inject constructor(
         }
 
         _categoryMap.value = mapOf(
-            "Expenses" to expenses,
-            "Income" to income,
-            "Transfer" to transfer
+            "expenses" to expenses,
+            "income" to income,
+            "transfer" to transfer
         )
     }
 }

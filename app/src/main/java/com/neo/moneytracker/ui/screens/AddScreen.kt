@@ -1,6 +1,5 @@
 package com.neo.moneytracker.ui.screens
 
-import android.widget.ImageButton
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,18 +21,21 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.neo.moneytracker.R
 import com.neo.moneytracker.ui.components.AmountInputDialog
-import com.neo.moneytracker.ui.components.BottomNavigationBar
 import com.neo.moneytracker.ui.components.SimpleTabLayoutforAdd
 import com.neo.moneytracker.ui.navigation.Screens
+import com.neo.moneytracker.ui.navigation.SealedBottomNavItem
 import com.neo.moneytracker.ui.theme.IconBackGroundColor
 import com.neo.moneytracker.ui.theme.LemonSecondary
-import com.neo.moneytracker.ui.theme.YellowOrange
 import com.neo.moneytracker.ui.viewmodel.AddViewModel
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
 
 @Composable
-fun AddScreen(navController: NavController, uiStateViewModel: UiStateViewModel, transactionViewModel: TransactionViewModel) {
+fun AddScreen(
+    navController: NavController,
+    uiStateViewModel: UiStateViewModel,
+    transactionViewModel: TransactionViewModel
+) {
     val viewModel: AddViewModel = hiltViewModel()
     //    val context = LocalContext.current
     val categoryMap by viewModel.categoryMap
@@ -46,6 +48,7 @@ fun AddScreen(navController: NavController, uiStateViewModel: UiStateViewModel, 
     var selectedItem by remember { mutableStateOf<String?>(null) }
     var selectedIcon by remember { mutableStateOf<Int?>(null) }
     val shouldShowBottomBar = selectedItem == null
+    val dialogVisible by uiStateViewModel.isDialogVisible.collectAsState()
 
     Scaffold(
         topBar = {
@@ -106,7 +109,6 @@ fun AddScreen(navController: NavController, uiStateViewModel: UiStateViewModel, 
         ) {
             val subWithIcons = categoryMap[selectedCategory] ?: emptyList()
 
-            // Scrollable container
             Column(modifier = Modifier.weight(1f)) {
                 SubcategoryGridScreen(
                     subWithIcons = subWithIcons,
@@ -117,22 +119,27 @@ fun AddScreen(navController: NavController, uiStateViewModel: UiStateViewModel, 
                     } else {
                         selectedItem = clickedItem
                         selectedIcon = iconRes
+
+                        uiStateViewModel.setDialogVisible(true)
                     }
                 }
             }
 
-            selectedItem?.let {
-                if (it != "Settings") {
-                    uiStateViewModel.setDialogVisible(true)
+            if (dialogVisible && selectedItem != null && selectedItem != "Settings") {
                     AmountInputDialog(
                         iconRes = selectedIcon!!,
-                        selectedCategory = it,
+                        selectedCategory = selectedCategory,
+                        selectedSubCategory = selectedItem!!,
                         transactionViewModel = transactionViewModel,
-                        navController=navController
-                        )
-                } else {
-                    navController.navigate(Screens.settings.route)
-                }
+                        onTransactionAdded = {
+                                transactionViewModel.addTransaction(it)
+                        },
+                        onDismiss = {
+                            uiStateViewModel.setDialogVisible(false)
+                            selectedItem = null
+                            navController.popBackStack(SealedBottomNavItem.records.route, inclusive = false)
+                        }
+                    )
             }
         }
     }

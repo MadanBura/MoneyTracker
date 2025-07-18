@@ -10,25 +10,28 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material.TextField
+import androidx.compose.material3.TextField as NewTextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults as NewTextFieldDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import com.neo.moneytracker.R
 import com.neo.moneytracker.data.localDb.entities.TransactionEntity
-import com.neo.moneytracker.ui.navigation.Screens
-import com.neo.moneytracker.ui.navigation.SealedBottomNavItem
+import com.neo.moneytracker.data.mapper.toDataEntity
+import com.neo.moneytracker.domain.model.Transaction
 import com.neo.moneytracker.ui.theme.IconBackGroundColor
 import com.neo.moneytracker.ui.theme.LemonSecondary
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
+import com.neo.moneytracker.utils.TransactionType
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -37,8 +40,10 @@ import java.util.Locale
 fun AmountInputDialog(
     iconRes: Int,
     selectedCategory: String,
+    selectedSubCategory : String,
     transactionViewModel: TransactionViewModel,
-    navController: NavController
+    onTransactionAdded: (TransactionEntity) -> Unit,
+    onDismiss : ()->Unit
 ) {
     var note by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("0") }
@@ -55,35 +60,50 @@ fun AmountInputDialog(
             .background(IconBackGroundColor)
             .padding(10.dp)
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 4.dp, vertical = 2.dp)
+                .padding(horizontal = 4.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Absolute.SpaceBetween
+                horizontalArrangement = Arrangement.Start
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.checklist),
-                    contentDescription = "Settings Icon",
+                TextField(
+                    value = amount,
+                    onValueChange = { newAmount ->
+                        if (newAmount.isEmpty() || newAmount.matches("^[0-9]*\\.?[0-9]*$".toRegex())) {
+                            amount = newAmount
+                        }
+                    },
                     modifier = Modifier
-                        .size(30.dp)
-                )
-
-                Text(
-                    text = amount,
-                    fontSize = 34.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier
-                        .padding(end = 4.dp),
-                    color = Color.Black
+                        .fillMaxWidth()
+                        .padding(end = 4.dp)
+                        .background(Color.Transparent),
+                    textStyle = TextStyle(
+                        fontSize = 34.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.Black,
+                        textAlign = TextAlign.End
+                    ),
+                    singleLine = true,
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    leadingIcon = {
+                        Image(
+                            painter = painterResource(id = R.drawable.checklist),
+                            contentDescription = "Settings Icon",
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
                 )
             }
 
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier
@@ -101,7 +121,7 @@ fun AmountInputDialog(
                     modifier = Modifier.padding(end = 8.dp)
                 )
 
-                TextField(
+                NewTextField(
                     value = note,
                     onValueChange = { note = it },
                     placeholder = { Text("Enter a note", color = Color.Gray) },
@@ -109,7 +129,7 @@ fun AmountInputDialog(
                         .weight(1f)
                         .align(Alignment.CenterVertically),
                     singleLine = true,
-                    colors = TextFieldDefaults.colors(
+                    colors = NewTextFieldDefaults.colors(
                         unfocusedContainerColor = Color.White,
                         focusedContainerColor = Color.White,
                         disabledContainerColor = Color.White,
@@ -133,8 +153,8 @@ fun AmountInputDialog(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            // Keypad
+            Spacer(modifier = Modifier.height(12.dp))
+
             keypadButtons.forEach { row ->
                 Row(
                     modifier = Modifier
@@ -144,22 +164,44 @@ fun AmountInputDialog(
                         Button(
                             onClick = {
                                 when (label) {
-                                    "⌫" -> {
+                                    "⌫" -> { // Backspace logic
                                         amount = if (amount.length > 1) amount.dropLast(1) else "0"
                                     }
+                                    "✔" -> { // Confirm transaction
+                                        val currentDate =
+                                            SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
 
-                                    "✔" -> {
-
+                                        val transaction = when(selectedCategory){
+                                            "expenses" ->{
+                                                Transaction(
+                                                    iconRes = iconRes,
+                                                    amount = amount,
+                                                    note = note,
+                                                    date = currentDate,
+                                                    category = selectedSubCategory,
+                                                    type = TransactionType.EXPENSES.name
+                                                )
+                                            }
+                                            "income" ->{
+                                                Transaction(
+                                                    iconRes = iconRes,
+                                                    amount = amount,
+                                                    note = note,
+                                                    date = currentDate,
+                                                    category = selectedSubCategory,
+                                                    type = TransactionType.INCOME.name
+                                                )
+                                            }
+                                            else-> null
+                                        }
+                                        transaction?.let { onTransactionAdded(it.toDataEntity()) }
+                                        amount = "0"
+                                        note = ""
+                                        onDismiss()
                                     }
-
                                     "Today" -> {
-                                        // Add date picker
-                                    }
 
-                                    "+", "-" -> {
-                                        // Optional math
                                     }
-
                                     "." -> if (!amount.contains(".")) amount += "."
                                     else -> {
                                         amount = if (amount == "0") label else amount + label
@@ -186,45 +228,20 @@ fun AmountInputDialog(
                                         horizontalArrangement = Arrangement.Center
                                     ) {
                                         Icon(
-                                            painter = painterResource(id = R.drawable.calendar), // Replace with your calendar icon
+                                            painter = painterResource(id = R.drawable.calendar),
                                             contentDescription = "Calendar Icon",
                                             tint = Color(0xFFFFC107),
-                                            modifier = Modifier
-                                                .size(18.dp)
-                                                .padding(end = 2.dp)
+                                            modifier = Modifier.size(18.dp)
                                         )
                                         Text(
                                             text = label,
-                                            fontSize = 14.sp, // smaller font size
+                                            fontSize = 14.sp,
                                             color = Color(0xFFFFC107),
                                             fontWeight = FontWeight.Medium
                                         )
                                     }
                                 }
-
                                 "✔" -> {
-
-                                    val currentDate =
-                                        SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(
-                                            Date()
-                                        )
-
-                                    val transaction = TransactionEntity(
-                                        iconRes = iconRes,
-                                        amount = amount,
-                                        note = note,
-                                        date = currentDate,
-                                        category = selectedCategory
-                                    )
-
-                                    transactionViewModel.addTransaction(transaction)
-                                    amount = "0"
-                                    note = ""
-
-                                    navController.navigate(SealedBottomNavItem.records.route) {
-                                        popUpTo(SealedBottomNavItem.records.route) { inclusive = false }
-                                    }
-
                                     Icon(
                                         painter = painterResource(id = R.drawable.check_),
                                         contentDescription = "Check Icon",
@@ -232,7 +249,6 @@ fun AmountInputDialog(
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
-
                                 else -> {
                                     Text(
                                         text = label,
@@ -242,7 +258,6 @@ fun AmountInputDialog(
                                     )
                                 }
                             }
-
                         }
                     }
                 }
@@ -250,3 +265,4 @@ fun AmountInputDialog(
         }
     }
 }
+

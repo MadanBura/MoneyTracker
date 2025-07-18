@@ -34,7 +34,6 @@ fun AppNavHost(navHostController: NavHostController) {
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-
     val uiStateViewModel: UiStateViewModel = hiltViewModel()
     val transactionViewModel : TransactionViewModel = hiltViewModel()
     val isDialogVisible by uiStateViewModel.isDialogVisible.collectAsState()
@@ -71,7 +70,7 @@ fun AppNavHost(navHostController: NavHostController) {
         ) {
             composable(SealedBottomNavItem.records.route) {
                 RecordScreen(
-                    navController = navHostController
+                    navController = navHostController, transactionViewModel
                 )
             }
             composable(Screens.searchScreen.route) {

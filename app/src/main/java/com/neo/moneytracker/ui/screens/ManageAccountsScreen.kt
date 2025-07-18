@@ -1,7 +1,9 @@
 package com.neo.moneytracker.ui.screens
 
+import android.os.Build
 import android.util.Log
 import android.widget.Space
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -31,6 +33,7 @@ import com.neo.moneytracker.ui.theme.LemonSecondary
 import com.neo.moneytracker.ui.theme.YellowOrange
 import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageAccounts(
@@ -75,71 +78,8 @@ fun ManageAccounts(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 70.dp)
-            ) {
-                items(list.size) { index ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.DoNotDisturbOn,
-                            contentDescription = null,
-                            tint = Color.Red,
-                            modifier = Modifier.clickable {
-                                addAccountViewModel.delAccount(list[index])
-                            }
-                        )
+            ReorderableListScreen(addAccountViewModel)
 
-                        Icon(
-                            painter = painterResource(id = R.drawable.account_add),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(35.dp)
-                                .padding(5.dp)
-                        )
-
-
-                        Column {
-                            Text(
-                                text = list[index].accountName,
-                                modifier = Modifier.padding(start = 10.dp),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Text(
-                                text = list[index].note,
-                                modifier = Modifier.padding(start = 10.dp),
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        Row(
-                            modifier = Modifier,
-                            horizontalArrangement = Arrangement.spacedBy(5.dp)
-                            ) {
-                            Icon(
-                                imageVector = Icons.Filled.Edit,
-                                contentDescription = null
-                            )
-                            Icon(
-                                imageVector = Icons.Filled.PushPin,
-                                contentDescription = null
-                            )
-                            Icon(
-                                imageVector = Icons.Filled.Menu,
-                                contentDescription = null
-                            )
-
-                        }
-                    }
-
-                }
-            }
 
 
             Button(

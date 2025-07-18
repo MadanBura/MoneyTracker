@@ -25,6 +25,14 @@ class AccountsViewModel @Inject constructor(
         }
     }
 
+    fun reorderAccounts(fromIndex: Int, toIndex: Int) {
+        val currentList = _accounts.value.toMutableList()
+        val movedItem = currentList.removeAt(fromIndex)
+        currentList.add(toIndex, movedItem)
+        _accounts.value = currentList
+    }
+
+
     init {
         getAccounts()
     }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -232,6 +233,7 @@ fun CustomCalendarDialog(
     val today = remember { Calendar.getInstance() }
     var displayedMonth by remember { mutableStateOf(today.get(Calendar.MONTH)) }
     var displayedYear by remember { mutableStateOf(today.get(Calendar.YEAR)) }
+    var selectedDay by remember { mutableStateOf(-1) }
 
     val daysInMonth = remember(displayedMonth, displayedYear) {
         val cal = Calendar.getInstance().apply {
@@ -253,14 +255,16 @@ fun CustomCalendarDialog(
 
     Box(
         modifier = Modifier
-            .background(Color.White, shape = RoundedCornerShape(12.dp))
+            .fillMaxWidth()
+            .background(Color.White, shape = RoundedCornerShape(16.dp))
             .padding(16.dp)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            // Month-Year Header
+            // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = {
                     if (displayedMonth == 0) {
@@ -298,16 +302,16 @@ fun CustomCalendarDialog(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Week Days
+            // Weekdays
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat").forEach {
+                listOf("S", "M", "T", "W", "T", "F", "S").forEach {
                     Text(text = it, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Calendar Grid
+            // Calendar grid
             val totalCells = daysInMonth + firstDayOfWeek
             val rows = (totalCells / 7) + if (totalCells % 7 > 0) 1 else 0
 
@@ -320,23 +324,36 @@ fun CustomCalendarDialog(
                         for (col in 0..6) {
                             val day = row * 7 + col - firstDayOfWeek + 1
                             if (day in 1..daysInMonth) {
+                                val currentDate = Calendar.getInstance().apply {
+                                    set(displayedYear, displayedMonth, day, 0, 0, 0)
+                                    set(Calendar.MILLISECOND, 0)
+                                }
+
+                                val isFutureDate = currentDate.after(today)
+
+                                val isSelected = selectedDay == day
+
                                 Box(
                                     modifier = Modifier
                                         .size(36.dp)
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(IconBackGroundColor)
-                                        .clickable {
-                                            val selected = Calendar.getInstance().apply {
-                                                set(displayedYear, displayedMonth, day)
+                                        .clip(CircleShape)
+                                        .background(
+                                            when {
+                                                isSelected -> LemonSecondary
+                                                isFutureDate -> Color.LightGray
+                                                else -> IconBackGroundColor
                                             }
-                                            val formatted = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-                                                .format(selected.time)
-                                            onDateSelected(formatted)
-                                            onDismiss()
+                                        )
+                                        .clickable(enabled = !isFutureDate) {
+                                            selectedDay = day
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text(text = day.toString(), fontSize = 14.sp)
+                                    Text(
+                                        text = day.toString(),
+                                        color = if (isFutureDate) Color.Gray else Color.Black,
+                                        fontSize = 14.sp
+                                    )
                                 }
                             } else {
                                 Spacer(modifier = Modifier.size(36.dp))
@@ -347,16 +364,40 @@ fun CustomCalendarDialog(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = LemonSecondary)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text("Close")
+                TextButton(onClick = onDismiss) {
+                    Text(text = "Cancel", color = LemonSecondary, fontWeight = FontWeight.Bold)
+                }
+
+                Button(
+                    onClick = {
+                        if (selectedDay != -1) {
+                            val selectedDate = Calendar.getInstance().apply {
+                                set(displayedYear, displayedMonth, selectedDay)
+                            }
+                            val formatted = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(
+                                selectedDate.time
+                            )
+                            onDateSelected(formatted)
+                            onDismiss()
+                        }
+                    },
+                    enabled = selectedDay != -1,
+                    colors = ButtonDefaults.buttonColors(containerColor = LemonSecondary)
+                ) {
+                    Text("Confirm")
+                }
             }
         }
     }
 }
+
 
 
 

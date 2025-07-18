@@ -12,8 +12,8 @@ import com.neo.moneytracker.ui.components.MonthlyStatsCard
 
 @Composable
 fun AnalyticsScreen(
-    expenseAmount: Double,
-    incomeAmount: Double,
+    expenseAmount: Int,
+    incomeAmount: Int,
     modifier: Modifier = Modifier
 ) {
     Column(

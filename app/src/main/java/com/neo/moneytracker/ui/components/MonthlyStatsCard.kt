@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun MonthlyStatsCard(expenseAmount: Double, incomeAmount: Double) {
+fun MonthlyStatsCard(expenseAmount: Int, incomeAmount: Int) {
     Card(
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth(),

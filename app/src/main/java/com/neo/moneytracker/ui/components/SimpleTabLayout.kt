@@ -26,7 +26,10 @@ import androidx.compose.ui.unit.dp
 import com.neo.moneytracker.ui.theme.LemonSecondary
 
 @Composable
-fun SimpleTabLayout(tabs: List<String>, onTabSelected: (String) -> Unit) {
+fun SimpleTabLayout(
+    tabs: List<String>,
+    onTabSelected: (String) -> Unit
+) {
     var selectedTab by remember { mutableStateOf(0) }
 
     Row(

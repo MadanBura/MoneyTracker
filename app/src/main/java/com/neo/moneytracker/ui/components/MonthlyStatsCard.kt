@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun MonthlyStatsCard() {
+fun MonthlyStatsCard(expenseAmount: Double, incomeAmount: Double) {
     Card(
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth(),
@@ -57,9 +57,9 @@ fun MonthlyStatsCard() {
                         Text("Balance", color = Color.Gray, modifier = Modifier.width(80.dp).weight(1f))
                     }
                     Row {
-                        Text("0", modifier = Modifier.width(80.dp).weight(1f))
-                        Text("0", modifier = Modifier.width(80.dp).weight(1f))
-                        Text("0", modifier = Modifier.width(80.dp).weight(1f))
+                        Text("$expenseAmount", modifier = Modifier.width(80.dp).weight(1f))
+                        Text("$incomeAmount", modifier = Modifier.width(80.dp).weight(1f))
+                        Text("${incomeAmount - expenseAmount}", modifier = Modifier.width(80.dp).weight(1f))
                     }
                 }
             }

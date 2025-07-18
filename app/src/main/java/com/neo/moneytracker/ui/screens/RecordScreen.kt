@@ -7,11 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,15 +18,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.neo.moneytracker.data.mapper.toDomainModel
-import com.neo.moneytracker.ui.components.CalendarPickerButton
-import com.neo.moneytracker.ui.components.DailySummaryRow
-import com.neo.moneytracker.ui.components.StickyFirstWithLazyRow
-import com.neo.moneytracker.ui.components.TransactionIcon
+import com.neo.moneytracker.ui.components.*
 import com.neo.moneytracker.ui.navigation.Screens
 import com.neo.moneytracker.ui.theme.LemonSecondary
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
-import com.neo.moneytracker.utils.TransactionType
-
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,22 +31,19 @@ fun RecordScreen(navController: NavHostController, transactionViewModel: Transac
     var selectedBook by remember { mutableStateOf("Default") }
 
     val transactionList by transactionViewModel.transactions.collectAsState(initial = emptyList())
-
-    val groupedTransactions = transactionList.groupBy { transaction ->
-        transaction.date
-    }
+    val dismissedItems = remember { mutableStateListOf<Int>() }
+    val visibleTransactions = transactionList.filterNot { dismissedItems.contains(it.id) }
+    val groupedTransactions = visibleTransactions.groupBy { it.date }
 
     val totalIncomeAmount = transactionViewModel.incomeTotalAmount.collectAsState()
-    var expenseAmount = transactionViewModel.expensesTotalAmount.collectAsState().value
+    val expenseAmount = transactionViewModel.expensesTotalAmount.collectAsState().value
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Money Tracker") },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        isDrawerOpen = !isDrawerOpen
-                    }) {
+                    IconButton(onClick = { isDrawerOpen = !isDrawerOpen }) {
                         Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
                 },
@@ -190,25 +179,61 @@ fun RecordScreen(navController: NavHostController, transactionViewModel: Transac
                     ) {
                         groupedTransactions.forEach { (date, transactionsList) ->
                             item {
-
                                 DailySummaryRow(date, transactionViewModel)
                                 HorizontalDivider(
                                     color = Color.LightGray,
                                     thickness = 1.dp,
                                     modifier = Modifier.padding(vertical = 8.dp)
                                 )
-
                             }
 
-                            items(transactionsList) { transaction ->
+                            items(
+                                transactionsList,
+                                key = { "${it.id}_${it.date}_${it.amount}_${it.note}" }) { transactionEntity ->
+//                                val swipeState = rememberSwipeToDismissBoxState()
+//                                val dismissed = swipeState.currentValue == SwipeToDismissBoxValue.EndToStart
+//
+//                                if (dismissed && !dismissedItems.contains(transactionEntity.id)) {
+//                                    LaunchedEffect(transactionEntity) {
+//                                        dismissedItems.add(transactionEntity.id)
+//                                        delay(250)
+//                                        transactionViewModel.deleteTransaction(transactionEntity.id)
+//                                    }
+//                                }
+//
+//                                SwipeToDismissBox(
+//                                    state = swipeState,
+//                                    enableDismissFromEndToStart = true,
+//                                    backgroundContent = {
+//                                        if (swipeState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+//                                            Box(
+//                                                modifier = Modifier
+//                                                    .fillMaxSize()
+//                                                    .background(Color.Red)
+//                                                    .padding(end = 20.dp),
+//                                                contentAlignment = Alignment.CenterEnd
+//                                            ) {
+//                                                Icon(
+//                                                    imageVector = Icons.Default.Delete,
+//                                                    contentDescription = "Delete",
+//                                                    tint = Color.White
+//                                                )
+//                                            }
+//                                        }
+//                                    }
+//                                ) {
+
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(vertical = 8.dp)
-                                        .background(Color.White, shape = RoundedCornerShape(8.dp)),
+                                        .background(
+                                            Color.White,
+                                            shape = RoundedCornerShape(8.dp)
+                                        ),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    TransactionIcon(transaction.toDomainModel())
+                                    TransactionIcon(transactionEntity.toDomainModel())
 
                                     Column(
                                         modifier = Modifier
@@ -216,7 +241,7 @@ fun RecordScreen(navController: NavHostController, transactionViewModel: Transac
                                             .padding(8.dp)
                                     ) {
                                         Text(
-                                            text = transaction.category,
+                                            text = transactionEntity.category,
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = Color.Black
@@ -224,26 +249,26 @@ fun RecordScreen(navController: NavHostController, transactionViewModel: Transac
                                     }
 
                                     Text(
-                                        text = "${transaction.amount}",
+                                        text = transactionEntity.amount,
                                         fontSize = 16.sp,
                                         color = Color.Black,
-                                        modifier = Modifier
-                                            .padding(8.dp)
+                                        modifier = Modifier.padding(8.dp)
                                     )
-
-
                                 }
                                 HorizontalDivider(
                                     color = Color.LightGray,
                                     thickness = 1.dp,
                                     modifier = Modifier.padding(vertical = 1.dp)
                                 )
-
                             }
+
                         }
+
                     }
                 }
+
             }
+
         }
     )
 }

@@ -1,6 +1,7 @@
 package com.neo.moneytracker.data.localDb.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -14,4 +15,6 @@ interface TransactionDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertTransaction(transaction: TransactionEntity)
-}
+
+    @Query("Delete from transactions where id = :id")
+    suspend fun deleteTransaction(id: Int)}

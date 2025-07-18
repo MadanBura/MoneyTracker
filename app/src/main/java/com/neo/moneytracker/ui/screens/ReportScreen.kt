@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,13 +26,17 @@ import androidx.navigation.NavHostController
 import com.neo.moneytracker.ui.components.SimpleTabLayout
 import com.neo.moneytracker.ui.theme.LemonSecondary
 import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
+import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportScreen(
     navController: NavHostController,
-    accountViewModel: AccountsViewModel
+    accountViewModel: AccountsViewModel,
+    transactionViewModel: TransactionViewModel
 ) {
+    val totalIncomeAmount = transactionViewModel.incomeTotalAmount.collectAsState().value
+    val expenseAmount = transactionViewModel.expensesTotalAmount.collectAsState().value
 
     var selectedTab by remember { mutableStateOf("Analytics") }
 
@@ -67,7 +72,7 @@ fun ReportScreen(
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             when(selectedTab){
-                "Analytics" -> AnalyticsScreen()
+                "Analytics" -> AnalyticsScreen(expenseAmount, totalIncomeAmount)
                 "Accounts" -> AccountsScreen(navController, accountViewModel)
             }
         }

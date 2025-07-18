@@ -54,4 +54,10 @@ class TransactionViewModel @Inject constructor(private val transactionRepository
         return Pair(incomeTotal, expenseTotal)
     }
 
+    fun deleteTransaction(id: Int) {
+        viewModelScope.launch {
+            transactionRepository.deleteTransaction(id)
+        }
+    }
+
 }

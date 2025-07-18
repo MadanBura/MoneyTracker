@@ -1,5 +1,6 @@
 package com.neo.moneytracker.data.repoImpl
 
+import androidx.compose.runtime.traceEventStart
 import com.neo.moneytracker.data.localDb.dao.TransactionDao
 import com.neo.moneytracker.data.mapper.toDataEntity
 import com.neo.moneytracker.data.mapper.toDomainModel
@@ -21,5 +22,9 @@ class TransactionImpl @Inject constructor(
 
     override suspend fun addTransaction(transaction: Transaction) {
         return transactionDao.insertTransaction(transaction.toDataEntity())
+    }
+
+    override suspend fun deleteTransaction(id: Int) {
+        return transactionDao.deleteTransaction(id)
     }
 }

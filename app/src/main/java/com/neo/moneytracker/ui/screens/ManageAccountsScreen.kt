@@ -124,7 +124,7 @@ fun ManageAccounts(
                         Row(
                             modifier = Modifier,
                             horizontalArrangement = Arrangement.spacedBy(5.dp)
-                            ) {
+                        ) {
                             Icon(
                                 imageVector = Icons.Filled.Edit,
                                 contentDescription = null,
@@ -141,26 +141,29 @@ fun ManageAccounts(
                                 imageVector = Icons.Filled.Menu,
                                 contentDescription = null
                             )
-            ReorderableListScreen(addAccountViewModel)
+                            ReorderableListScreen(addAccountViewModel)
 
 
 
-            Button(
-                onClick = {
-                    navController.navigate(Screens.addAccount.route)
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = LemonSecondary,
-                    contentColor = Color.Black,
-                    disabledContainerColor = Color.LightGray
-                ),
-                shape = RectangleShape,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(15.dp)
-                    .fillMaxWidth()
-            ) {
-                Text(text = "+ Add")
+                            Button(
+                                onClick = {
+                                    navController.navigate(Screens.addAccount.route)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = LemonSecondary,
+                                    contentColor = Color.Black,
+                                    disabledContainerColor = Color.LightGray
+                                ),
+                                shape = RectangleShape,
+                                modifier = Modifier
+                                    .padding(15.dp)
+                                    .fillMaxWidth()
+                            ) {
+                                Text(text = "+ Add")
+                            }
+                        }
+                    }
+                }
             }
         }
     }

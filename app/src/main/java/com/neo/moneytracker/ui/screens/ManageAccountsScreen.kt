@@ -37,14 +37,11 @@ import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageAccounts(
-    addAccountViewModel:AccountsViewModel,
+    addAccountViewModel: AccountsViewModel,
     navController: NavHostController
 ) {
-
     val list = addAccountViewModel.accounts.collectAsState().value
 
-
-    Log.d("HELLO", list.toString())
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -72,98 +69,35 @@ fun ManageAccounts(
             )
         }
     ) { innerPadding ->
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            LazyColumn(
+            // Scrollable list with bottom padding
+            ReorderableListScreen(
+                addAccountViewModel = addAccountViewModel,
+                navController
+
+            )
+
+            // Fixed "+ Add" button at bottom
+            Button(
+                onClick = {
+                    navController.navigate(Screens.addAccount.route)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LemonSecondary,
+                    contentColor = Color.Black,
+                    disabledContainerColor = Color.LightGray
+                ),
+                shape = RectangleShape,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 70.dp)
+                    .align(Alignment.BottomCenter)
+                    .padding(15.dp)
+                    .fillMaxWidth()
             ) {
-                items(list.size) { index ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.DoNotDisturbOn,
-                            contentDescription = null,
-                            tint = Color.Red,
-                            modifier = Modifier.clickable {
-                                addAccountViewModel.delAccount(list[index])
-                            }
-                        )
-
-                        Icon(
-                            painter = painterResource(id = R.drawable.account_add),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(35.dp)
-                                .padding(5.dp)
-                        )
-
-
-                        Column {
-                            Text(
-                                text = list[index].accountName,
-                                modifier = Modifier.padding(start = 10.dp),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Text(
-                                text = list[index].note,
-                                modifier = Modifier.padding(start = 10.dp),
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        Row(
-                            modifier = Modifier,
-                            horizontalArrangement = Arrangement.spacedBy(5.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Edit,
-                                contentDescription = null,
-                                modifier = Modifier.clickable {
-                                    val accountId = list[index].id
-                                    navController.navigate(Screens.editAccount.createRoute(accountId))
-                                }
-                            )
-                            Icon(
-                                imageVector = Icons.Filled.PushPin,
-                                contentDescription = null
-                            )
-                            Icon(
-                                imageVector = Icons.Filled.Menu,
-                                contentDescription = null
-                            )
-                            ReorderableListScreen(addAccountViewModel)
-
-
-
-                            Button(
-                                onClick = {
-                                    navController.navigate(Screens.addAccount.route)
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = LemonSecondary,
-                                    contentColor = Color.Black,
-                                    disabledContainerColor = Color.LightGray
-                                ),
-                                shape = RectangleShape,
-                                modifier = Modifier
-                                    .padding(15.dp)
-                                    .fillMaxWidth()
-                            ) {
-                                Text(text = "+ Add")
-                            }
-                        }
-                    }
-                }
+                Text(text = "+ Add")
             }
         }
     }

@@ -18,11 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.neo.moneytracker.ui.navigation.Screens
 import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ReorderableListScreen(addAccountViewModel: AccountsViewModel) {
+fun ReorderableListScreen(addAccountViewModel: AccountsViewModel, navHostController: NavHostController) {
     val accounts by addAccountViewModel.accounts.collectAsState()
     val state = rememberLazyListState()
     val draggedItemIndex = remember { mutableStateOf<Int?>(null) }
@@ -93,7 +95,10 @@ fun ReorderableListScreen(addAccountViewModel: AccountsViewModel) {
                     }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                        Icon(imageVector = Icons.Filled.Edit, contentDescription = null)
+                        Icon(imageVector = Icons.Filled.Edit, contentDescription = null, modifier = Modifier.clickable {
+                            val accountId = item.id
+                            navHostController.navigate(Screens.editAccount.createRoute(accountId))
+                        })
                         Icon(imageVector = Icons.Filled.PushPin, contentDescription = null)
                         Icon(
                             imageVector = Icons.Filled.Menu,

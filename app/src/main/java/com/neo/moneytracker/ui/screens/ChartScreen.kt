@@ -67,7 +67,6 @@ fun ChartScreen() {
                     .background(LemonSecondary)
                     .padding(horizontal = 8.dp, vertical = 8.dp)
             ) {
-                // Title (Reports)
                 Row (
                     modifier = Modifier
                         .fillMaxWidth()

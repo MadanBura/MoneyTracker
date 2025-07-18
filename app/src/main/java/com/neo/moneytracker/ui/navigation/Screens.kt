@@ -6,5 +6,7 @@ sealed class Screens(val route: String) {
 
     object addAccount: Screens("AddAccount")
     object manageAccount: Screens("manageAccount")
-
+    object editAccount : Screens("editAccount/{accountId}") {
+        fun createRoute(accountId: Int) = "editAccount/$accountId"
+    }
 }

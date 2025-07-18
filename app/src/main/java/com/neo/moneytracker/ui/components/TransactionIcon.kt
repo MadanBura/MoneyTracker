@@ -14,6 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.neo.moneytracker.domain.model.Transaction
 import kotlin.random.Random
+import com.neo.moneytracker.R
 
 @Composable
 fun TransactionIcon(transaction: Transaction) {
@@ -38,7 +39,7 @@ fun TransactionIcon(transaction: Transaction) {
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            painter = painterResource(id = transaction.iconRes),
+            painter = if (transaction.iconRes != null) painterResource(transaction.iconRes) else painterResource(R.drawable.notfound),
             contentDescription = transaction.category,
             modifier = Modifier.size(24.dp),
             tint = Color.White

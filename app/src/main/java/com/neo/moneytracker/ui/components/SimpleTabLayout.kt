@@ -26,16 +26,11 @@ import androidx.compose.ui.unit.dp
 import com.neo.moneytracker.ui.theme.LemonSecondary
 
 @Composable
-fun SimpleTabLayout(tabs: List<String>, onTabSelected: (String) -> Unit) {
+fun SimpleTabLayout(tabs: List<String>, onTabSelected: (String) -> Unit, modifier: Modifier) {
     var selectedTab by remember { mutableStateOf(0) }
 
     Row(
-        modifier = Modifier
-            .height(40.dp)
-            .background(color = LemonSecondary)
-            .padding(horizontal = 16.dp, vertical = 2.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .border(1.dp, Color.Black, RoundedCornerShape(12.dp))
+        modifier = modifier
     ) {
         tabs.forEachIndexed { index, tab ->
             val isSelected = index == selectedTab

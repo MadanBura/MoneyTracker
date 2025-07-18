@@ -42,7 +42,7 @@ fun AppNavHost(navHostController: NavHostController) {
     val currentRoute = navBackStackEntry?.destination?.route
 
     val uiStateViewModel: UiStateViewModel = hiltViewModel()
-    val transactionViewModel : TransactionViewModel = hiltViewModel()
+    val transactionViewModel: TransactionViewModel = hiltViewModel()
     val isDialogVisible by uiStateViewModel.isDialogVisible.collectAsState()
 
     val accountViewModel: AccountsViewModel = hiltViewModel()
@@ -107,7 +107,7 @@ fun AppNavHost(navHostController: NavHostController) {
                 AddAccountScreen(navHostController, accountViewModel)
             }
             composable(Screens.manageAccount.route) {
-                ManageAccounts(accountViewModel,navHostController)
+                ManageAccounts(accountViewModel, navHostController)
             }
 
             composable(
@@ -121,11 +121,13 @@ fun AppNavHost(navHostController: NavHostController) {
                     accountId = accountId
                 )
             }
-            composable(Screens.settings.route){
+            composable(Screens.settings.route) {
                 ManageCategoryScreen(navHostController)
             }
-            composable(Screens.addCateogryScreen.route){
-                AddCategoryScreen()
+            composable(Screens.addCateogryScreen.route) {
+                AddCategoryScreen(
+                    navController = navHostController
+                )
             }
         }
     }

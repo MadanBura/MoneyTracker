@@ -1,6 +1,7 @@
 package com.neo.moneytracker.ui.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -16,6 +17,9 @@ class AddViewModel @Inject constructor(
 
     private val _categoryMap = mutableStateOf<Map<String, List<Pair<String, Int>>>>(emptyMap())
     val categoryMap: State<Map<String, List<Pair<String, Int>>>> = _categoryMap
+
+    private val _subcategoryAdded = mutableStateOf(false)
+    val subcategoryAdded: State<Boolean> get() = _subcategoryAdded
 
     init {
         loadCategories()
@@ -41,5 +45,26 @@ class AddViewModel @Inject constructor(
             "income" to income,
             "transfer" to transfer
         )
+    }
+
+    fun addCategory(type: String, name: String, iconRes: Int) {
+        val updatedList = categoryMap.value[type]?.toMutableList() ?: mutableListOf()
+        updatedList.add(name to iconRes)
+        _categoryMap.value = categoryMap.value.toMutableMap().apply {
+            put(type, updatedList)
+        }
+    }
+
+    fun addSubcategory(type: String, subcategoryName: String, iconRes: Int) {
+
+        Log.d("AddViewModel", "Before adding subcategory: ${categoryMap.value}")
+
+        val updatedList = categoryMap.value[type]?.toMutableList() ?: mutableListOf()
+        updatedList.add(0,subcategoryName to iconRes)
+        _categoryMap.value = categoryMap.value.toMutableMap().apply {
+            put(type, updatedList)
+        }
+        Log.d("AddViewModel", "After adding subcategory: ${categoryMap.value}")
+        _subcategoryAdded.value = true
     }
 }

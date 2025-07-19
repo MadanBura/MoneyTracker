@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.neo.moneytracker.R
 import com.neo.moneytracker.ui.components.AmountInputDialog
 import com.neo.moneytracker.ui.components.SimpleTabLayoutforAdd
@@ -39,7 +40,9 @@ fun AddScreen(
     navController: NavController,
     uiStateViewModel: UiStateViewModel,
     transactionViewModel: TransactionViewModel,
-    accountViewModel: AccountsViewModel
+    accountViewModel: AccountsViewModel,
+    transactionId: Int? = null,
+    isEdit: Boolean = false
 ) {
     val viewModel: AddViewModel = hiltViewModel()
     //    val context = LocalContext.current
@@ -52,8 +55,29 @@ fun AddScreen(
 
     var selectedItem by remember { mutableStateOf<String?>(null) }
     var selectedIcon by remember { mutableStateOf<Int?>(null) }
-    val shouldShowBottomBar = selectedItem == null
     val dialogVisible by uiStateViewModel.isDialogVisible.collectAsState()
+
+    val transactions = transactionViewModel.transactions.collectAsState().value
+    val transactionToEdit = remember(transactionId, transactions) {
+        transactionId?.let { id -> transactions.find { it.id == id } }
+    }
+
+    LaunchedEffect(transactionId, transactionViewModel.transactions.collectAsState().value) {
+        println("Transactions available: ${transactionViewModel.transactions.value}")
+        println("Looking for ID: $transactionId")
+    }
+
+    LaunchedEffect(transactionToEdit, isEdit) {
+        if (isEdit) {
+            transactionToEdit?.let { tx ->
+                selectedTabIndex = categories.indexOf(tx.category).takeIf { it >= 0 } ?: 0
+                selectedItem = tx.category
+                selectedIcon = tx.iconRes
+                uiStateViewModel.setDialogVisible(true)
+            }
+        }
+    }
+
 
     Scaffold(
         topBar = {
@@ -137,21 +161,32 @@ fun AddScreen(
             }
 
             if (dialogVisible && selectedItem != null && selectedItem != "Settings") {
-                    AmountInputDialog(
-                        iconRes = selectedIcon!!,
-                        selectedCategory = selectedCategory,
-                        selectedSubCategory = selectedItem!!,
-                        transactionViewModel = transactionViewModel,
-                        onTransactionAdded = {
-                                transactionViewModel.addTransaction(it)
-                        },
-                        onDismiss = {
-                            uiStateViewModel.setDialogVisible(false)
-                            selectedItem = null
-                            navController.popBackStack(SealedBottomNavItem.records.route, inclusive = false)
-                        },
-                        accountViewModel = accountViewModel
-                    )
+                AmountInputDialog(
+                    iconRes = selectedIcon!!,
+                    selectedCategory = selectedCategory,
+                    selectedSubCategory = selectedItem!!,
+                    transactionViewModel = transactionViewModel,
+                    onTransactionAdded = { newTransaction ->
+                        if (isEdit && transactionToEdit != null) {
+                            val updated = newTransaction.copy(id = transactionToEdit!!.id)
+                            transactionViewModel.updateTransaction(updated)
+                        } else {
+                            transactionViewModel.addTransaction(newTransaction)
+                        }
+                    },
+                    onDismiss = {
+                        uiStateViewModel.setDialogVisible(false)
+                        selectedItem = null
+                        navController.popBackStack(
+                            SealedBottomNavItem.records.route,
+                            inclusive = false
+                        )
+                    },
+                    accountViewModel = accountViewModel,
+                    initialAmount = transactionToEdit?.amount.orEmpty(),
+                    initialDate = transactionToEdit?.date ?: "",
+                    initialNote = transactionToEdit?.note ?: ""
+                )
             }
         }
     }

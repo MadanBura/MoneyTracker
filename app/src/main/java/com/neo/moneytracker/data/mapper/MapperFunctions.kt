@@ -62,6 +62,7 @@ import com.neo.moneytracker.utils.TransactionType
 
 fun TransactionEntity.toDomainModel(): Transaction {
     return Transaction(
+        id = id,
         iconRes = this.iconRes,
         amount = this.amount,
         note = this.note,
@@ -73,11 +74,12 @@ fun TransactionEntity.toDomainModel(): Transaction {
 
 fun Transaction.toDataEntity(): TransactionEntity {
     return TransactionEntity(
+        id = id,
         iconRes = this.iconRes,
         amount = this.amount,
         note = this.note,
         date = this.date,
         category = this.category,
-        type = this.type // "Expense" or "Income"
+        type = this.type
     )
 }

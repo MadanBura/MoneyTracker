@@ -108,7 +108,9 @@ fun AppNavHost(navHostController: NavHostController) {
                 AddAccountScreen(navHostController, accountViewModel)
             }
             composable(Screens.manageAccount.route) {
-                ManageAccounts(accountViewModel, navHostController)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ManageAccounts(accountViewModel, navHostController)
+                }
             }
 
             composable(
@@ -130,6 +132,28 @@ fun AppNavHost(navHostController: NavHostController) {
                     navController = navHostController
                 )
             }
+
+
+            composable(
+                "add_screen?transactionId={transactionId}&isEdit={isEdit}",
+                arguments = listOf(
+                    navArgument("transactionId") { type = NavType.IntType; defaultValue = -1 },
+                    navArgument("isEdit") { type = NavType.BoolType; defaultValue = false }
+                )
+            ) { backStackEntry ->
+                val transactionId = backStackEntry.arguments?.getInt("transactionId")?.takeIf { it != -1 }
+                val isEdit = backStackEntry.arguments?.getBoolean("isEdit") ?: false
+
+                AddScreen(
+                    navController = navHostController,
+                    uiStateViewModel = hiltViewModel(),
+                    transactionViewModel = hiltViewModel(),
+                    accountViewModel = hiltViewModel(),
+                    transactionId = transactionId,
+                    isEdit = isEdit
+                )
+            }
+
         }
     }
 }

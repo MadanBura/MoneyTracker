@@ -1,7 +1,5 @@
 package com.neo.moneytracker.ui.components
 
-import ads_mobile_sdk.h6
-import android.accounts.Account
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
@@ -14,17 +12,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material3.*
 import androidx.compose.material.TextField
 import androidx.compose.material3.TextField as NewTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
@@ -32,6 +24,7 @@ import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material3.TextFieldDefaults as NewTextFieldDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,11 +63,14 @@ fun AmountInputDialog(
     transactionViewModel: TransactionViewModel,
     accountViewModel: AccountsViewModel,
     onTransactionAdded: (TransactionEntity) -> Unit,
-    onDismiss : ()->Unit
+    onDismiss : ()->Unit,
+    initialAmount: String = "",
+    initialNote: String = "",
+    initialDate: String = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
 ) {
-    var note by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("0") }
-    var showCalendar by remember { mutableStateOf(false) }
+    var note by rememberSaveable { mutableStateOf(initialNote) }
+    var amount by rememberSaveable { mutableStateOf(initialAmount) }
+    var showCalendar by rememberSaveable{ mutableStateOf(false) }
 
     val calendar = Calendar.getInstance()
     var selectedDate by remember {
@@ -231,6 +227,7 @@ fun AmountInputDialog(
                                         val transaction = when(selectedCategory){
                                             "expenses" ->{
                                                 Transaction(
+                                                    id =0,
                                                     iconRes = iconRes,
                                                     amount = amount,
                                                     note = note,
@@ -241,6 +238,7 @@ fun AmountInputDialog(
                                             }
                                             "income" ->{
                                                 Transaction(
+                                                    id =0,
                                                     iconRes = iconRes,
                                                     amount = amount,
                                                     note = note,

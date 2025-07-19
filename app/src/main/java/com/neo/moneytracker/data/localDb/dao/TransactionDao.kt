@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.neo.moneytracker.data.localDb.entities.TransactionEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -14,7 +15,12 @@ interface TransactionDao {
     fun getAllTransactions(): Flow<List<TransactionEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertTransaction(transaction: TransactionEntity)
+    suspend fun insertTransaction(transaction: TransactionEntity): Long
 
     @Query("Delete from transactions where id = :id")
-    suspend fun deleteTransaction(id: Int)}
+    suspend fun deleteTransaction(id: Int)
+
+    @Update
+    suspend fun updateTransaction(transaction: TransactionEntity)
+
+}

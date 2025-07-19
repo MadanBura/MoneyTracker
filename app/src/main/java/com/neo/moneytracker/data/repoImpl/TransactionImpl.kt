@@ -20,11 +20,15 @@ class TransactionImpl @Inject constructor(
         }
     }
 
-    override suspend fun addTransaction(transaction: Transaction) {
+    override suspend fun addTransaction(transaction: Transaction): Long {
         return transactionDao.insertTransaction(transaction.toDataEntity())
     }
 
     override suspend fun deleteTransaction(id: Int) {
         return transactionDao.deleteTransaction(id)
+    }
+
+    override suspend fun updateTransaction(transaction: Transaction) {
+        return transactionDao.updateTransaction(transaction.toDataEntity())
     }
 }

@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Money
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -20,6 +18,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,13 +26,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.neo.moneytracker.R
-import com.neo.moneytracker.ui.theme.LemonPrimary
+import com.neo.moneytracker.ui.navigation.Screens
 import com.neo.moneytracker.ui.theme.LemonSecondary
-import com.neo.moneytracker.ui.theme.YellowOrange
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 
 @Composable
-fun AccountsScreen(modifier: Modifier = Modifier) {
+fun AccountsScreen(
+    navController: NavHostController,
+    accountViewModel: AccountsViewModel,
+    modifier: Modifier = Modifier
+) {
+    val assets = accountViewModel.assets.collectAsState().value
+    val liabilities = accountViewModel.liabilities.collectAsState().value
+    val netWorth = accountViewModel.netWorth.collectAsState().value
+
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
@@ -48,12 +56,12 @@ fun AccountsScreen(modifier: Modifier = Modifier) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text("Net Worth", color = Color.DarkGray)
-                Text("0", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                Text("$netWorth", fontWeight = FontWeight.Bold, fontSize = 20.sp)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text("Assets", color = Color.DarkGray)
-                Text("0", fontWeight = FontWeight.Bold)
+                Text("$assets", fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -72,7 +80,7 @@ fun AccountsScreen(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text("Liabilities", color = Color.DarkGray)
-                Text("0", fontWeight = FontWeight.Bold)
+                Text("$liabilities", fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -84,20 +92,30 @@ fun AccountsScreen(modifier: Modifier = Modifier) {
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        AccountButton("Add Account", modifier = Modifier.weight(1f))
-        AccountButton("Manage Accounts", modifier = Modifier.weight(1f))
+        AccountButton(
+            "Add Account",
+            modifier = Modifier.weight(1f),
+            onClick = {
+                navController.navigate(Screens.addAccount.route)
+            }
+        )
+        AccountButton(
+            "Manage Accounts",
+            modifier = Modifier.weight(1f),
+            onClick = { navController.navigate(Screens.manageAccount.route) }
+        )
     }
 }
-
 
 
 @Composable
 fun AccountButton(
     text: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Button(
-        onClick = {  },
+        onClick = { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Color.LightGray),

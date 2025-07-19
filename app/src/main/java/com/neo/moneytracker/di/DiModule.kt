@@ -1,8 +1,14 @@
 package com.neo.moneytracker.di
 
 import android.content.Context
+import com.neo.moneytracker.data.localDb.dao.AddAccountDao
+import com.neo.moneytracker.data.localDb.dao.TransactionDao
+import com.neo.moneytracker.data.repoImpl.AccountRepositoryImpl
 import com.neo.moneytracker.data.repoImpl.CategoryRepoImpl
+import com.neo.moneytracker.data.repoImpl.TransactionImpl
+import com.neo.moneytracker.domain.repository.AccountRepository
 import com.neo.moneytracker.domain.repository.CategoryRepository
+import com.neo.moneytracker.domain.repository.TransactionRepository
 import com.neo.moneytracker.domain.usecase.CategoryDataUseCase
 import dagger.Module
 import dagger.Provides
@@ -31,4 +37,15 @@ class DiModule {
         return CategoryDataUseCase(repository)
     }
 
+    @Provides
+    @Singleton
+    fun providesTransactionRepository(transactionDao: TransactionDao):TransactionRepository{
+        return TransactionImpl(transactionDao)
+    }
+
+    @Provides
+    @Singleton
+    fun providesAccountRepository(addAccount: AddAccountDao): AccountRepository{
+        return AccountRepositoryImpl(addAccount)
+    }
 }

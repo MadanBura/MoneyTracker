@@ -1,29 +1,51 @@
 package com.neo.moneytracker.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.FabPosition
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.neo.moneytracker.ui.components.BottomNavigationBar
 import com.neo.moneytracker.ui.components.FabAddButton
 import com.neo.moneytracker.ui.components.SearchSpec
+import com.neo.moneytracker.ui.screens.AddAccountScreen
+import com.neo.moneytracker.ui.screens.AddCategoryScreen
 import com.neo.moneytracker.ui.screens.AddScreen
 import com.neo.moneytracker.ui.screens.ChartScreen
+import com.neo.moneytracker.ui.screens.EditAccountScreen
+import com.neo.moneytracker.ui.screens.ManageAccounts
+import com.neo.moneytracker.ui.screens.ManageCategoryScreen
 import com.neo.moneytracker.ui.screens.MeScreen
 import com.neo.moneytracker.ui.screens.ReportScreen
 import com.neo.moneytracker.ui.screens.RecordScreen
 
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
+import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
+import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(navHostController: NavHostController) {
     val navBackStackEntry by navHostController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    val uiStateViewModel: UiStateViewModel = hiltViewModel()
+    val transactionViewModel: TransactionViewModel = hiltViewModel()
+    val isDialogVisible by uiStateViewModel.isDialogVisible.collectAsState()
+
+    val accountViewModel: AccountsViewModel = hiltViewModel()
 
     val showBottomBar = currentRoute in listOf(
         SealedBottomNavItem.records.route,
@@ -31,7 +53,7 @@ fun AppNavHost(navHostController: NavHostController) {
         SealedBottomNavItem.add.route,
         SealedBottomNavItem.reports.route,
         SealedBottomNavItem.me.route
-    )
+    ) && !isDialogVisible
 
     Scaffold(
         bottomBar = {
@@ -55,7 +77,7 @@ fun AppNavHost(navHostController: NavHostController) {
         ) {
             composable(SealedBottomNavItem.records.route) {
                 RecordScreen(
-                    navController = navHostController
+                    navController = navHostController, transactionViewModel
                 )
             }
             composable(Screens.searchScreen.route) {
@@ -69,15 +91,69 @@ fun AppNavHost(navHostController: NavHostController) {
             }
 
             composable(SealedBottomNavItem.add.route) {
-                AddScreen(navHostController)
+                AddScreen(navHostController, uiStateViewModel, transactionViewModel, accountViewModel)
             }
 
             composable(SealedBottomNavItem.reports.route) {
-                ReportScreen()
+                ReportScreen(
+                    navHostController,
+                    accountViewModel,
+                    transactionViewModel
+                )
             }
             composable(SealedBottomNavItem.me.route) {
                 MeScreen()
             }
+            composable(Screens.addAccount.route) {
+                AddAccountScreen(navHostController, accountViewModel)
+            }
+            composable(Screens.manageAccount.route) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ManageAccounts(accountViewModel, navHostController)
+                }
+            }
+
+            composable(
+                route = "editAccount/{accountId}",
+                arguments = listOf(navArgument("accountId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val accountId = backStackEntry.arguments?.getInt("accountId") ?: 0
+                EditAccountScreen(
+                    navController = navHostController,
+                    accountViewModel = accountViewModel,
+                    accountId = accountId
+                )
+            }
+            composable(Screens.settings.route) {
+                ManageCategoryScreen(navHostController)
+            }
+            composable(Screens.addCateogryScreen.route) {
+                AddCategoryScreen(
+                    navController = navHostController
+                )
+            }
+
+
+            composable(
+                "add_screen?transactionId={transactionId}&isEdit={isEdit}",
+                arguments = listOf(
+                    navArgument("transactionId") { type = NavType.IntType; defaultValue = -1 },
+                    navArgument("isEdit") { type = NavType.BoolType; defaultValue = false }
+                )
+            ) { backStackEntry ->
+                val transactionId = backStackEntry.arguments?.getInt("transactionId")?.takeIf { it != -1 }
+                val isEdit = backStackEntry.arguments?.getBoolean("isEdit") ?: false
+
+                AddScreen(
+                    navController = navHostController,
+                    uiStateViewModel = hiltViewModel(),
+                    transactionViewModel = hiltViewModel(),
+                    accountViewModel = hiltViewModel(),
+                    transactionId = transactionId,
+                    isEdit = isEdit
+                )
+            }
+
         }
     }
 }

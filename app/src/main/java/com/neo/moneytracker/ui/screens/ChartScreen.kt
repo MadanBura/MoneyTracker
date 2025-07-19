@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -67,8 +70,7 @@ fun ChartScreen() {
                     .background(LemonSecondary)
                     .padding(horizontal = 8.dp, vertical = 8.dp)
             ) {
-                // Title (Reports)
-                Row (
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp, bottom = 8.dp),
@@ -88,7 +90,7 @@ fun ChartScreen() {
                             expanded = true
                         }
                     )
-                    if(expanded) {
+                    if (expanded) {
                         DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false }
@@ -109,17 +111,25 @@ fun ChartScreen() {
 
 
                 Spacer(modifier = Modifier.padding(bottom = 4.dp))
-                SimpleTabLayout(listOf("Month", "Year")){
-                    selectedTab = it
-                }
+                SimpleTabLayout(
+                    listOf("Month", "Year"), {
+                        selectedTab = it
+                    },
+                    modifier = Modifier
+                        .height(40.dp)
+                        .background(color = LemonSecondary)
+                        .padding(horizontal = 16.dp, vertical = 2.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(1.dp, Color.Black, RoundedCornerShape(12.dp))
+                )
                 Spacer(modifier = Modifier.padding(bottom = 6.dp))
             }
         }
-    ){paddingValues ->
+    ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             // Main screen content below tabs
 //            ScrollableMonthRow()
-            when(selectedTab){
+            when (selectedTab) {
                 "Month" -> MonthScreen()
                 "Year" -> YearScreen()
             }

@@ -25,10 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.neo.moneytracker.ui.theme.LemonSecondary
+import kotlin.math.exp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StickyFirstWithLazyRow() {
+fun StickyFirstWithLazyRow(expenseAmount: Int, incomeAmount: Int) {
     val categories = listOf("Expenses", "Income", "Balance")
     var showMonthPicker by remember { mutableStateOf(false) }
 
@@ -46,7 +48,7 @@ fun StickyFirstWithLazyRow() {
 
         Box(
             modifier = Modifier
-                .background(Color(0xFFFFE44C))
+                .background(LemonSecondary)
                 .padding(16.dp)
                 .clickable {
                     showMonthPicker = true
@@ -71,17 +73,24 @@ fun StickyFirstWithLazyRow() {
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
+        ) {
             items(categories) { category ->
                 Box(
                     modifier = Modifier
                         .padding(8.dp)
-                        .background(Color(0xFFFFE44C))
+                        .background(LemonSecondary)
                         .padding(0.dp)
                 ) {
                     Column {
                         Text(category)
-                        Text("0")
+                        Text(
+                            text = when (category) {
+                                "Expenses" -> "${expenseAmount}"
+                                "Income" -> "${incomeAmount}"
+                                "Balance" -> "${incomeAmount - expenseAmount}"
+                                else -> "0"
+                            }
+                        )
                     }
                 }
             }

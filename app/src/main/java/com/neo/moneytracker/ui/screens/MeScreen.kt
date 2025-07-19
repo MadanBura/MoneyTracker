@@ -51,8 +51,7 @@ fun MeScreen() {
     Box{
         Card(Modifier
                 .fillMaxWidth()
-                .height(130.dp)
-            ,
+                .height(130.dp),
             shape = RoundedCornerShape(
                 topStart = 0.dp,
                 topEnd = 0.dp,
@@ -88,7 +87,6 @@ fun MeScreen() {
         )
     }
 }
-
 
 @Composable
 fun TopSection(

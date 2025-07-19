@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,25 +25,26 @@ import com.neo.moneytracker.ui.theme.LemonSecondary
 fun SimpleTabLayoutforAdd(
     tabs: List<String>,
     selectedIndex: Int,
-    onTabSelected: (Int) -> Unit
+    onTabSelected: (Int) -> Unit,
+    modifier: Modifier
 ) {
     Row(
-        modifier = Modifier
-            .wrapContentHeight()
-            .background(color = LemonSecondary)
-            .padding(horizontal = 16.dp, vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .border(1.dp, Color.Black, RoundedCornerShape(12.dp))
+        modifier = modifier
     ) {
         tabs.forEachIndexed { index, tab ->
             val isSelected = index == selectedIndex
             Box(
                 modifier = Modifier
                     .weight(1f)
+                    .wrapContentHeight()
                     .background(if (isSelected) Color.Black else LemonSecondary)
+                    .then(
+                        if (!isSelected) Modifier.border(width = (0.2).dp, color = Color.Black)
+                        else Modifier
+                    )
                     .clip(RoundedCornerShape(12.dp))
                     .clickable { onTabSelected(index) }
-                    .padding(vertical = 12.dp),
+                    .padding(6.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(

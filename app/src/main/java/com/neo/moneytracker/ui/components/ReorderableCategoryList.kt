@@ -45,7 +45,7 @@ fun ReorderableSubCategoryList(
         state = state,
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 70.dp)
+            .padding(bottom = 0.dp)
     ) {
         itemsIndexed(subcategories, key = { _, item -> item.first }) { index, (name, iconRes) ->
             val isDragging = draggedItemIndex.value == index

@@ -122,5 +122,5 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.0")
 
     implementation("androidx.compose.material:material:1.6.1")
-
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }

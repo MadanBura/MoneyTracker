@@ -1,5 +1,6 @@
 package com.neo.moneytracker.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -29,22 +30,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.unit.dp
+import com.neo.moneytracker.data.localDb.entities.TransactionEntity
 import com.neo.moneytracker.utils.listOfColors
 
 @Composable
-fun DonutChartPreview(data: List<Pair<String, Int>>) {
+fun DonutChartPreview(data: List<TransactionEntity>) {
 
+    val color = listOfColors()
+    var total = 0
+
+    val pair = mutableListOf<Pair<String, Int>>()
+    for (i in data){
+        total += i.amount.toInt()
+        pair.add(Pair(i.type, i.amount.toInt()))
+
+    }
     Row {
+
+        Log.d("HELLO_DATA_CHART_pre", pair.toString())
+
         DonutChartWithTotal(
-            data1 = data,
+            data1 = pair,
             modifier = Modifier
                 .size(200.dp)
                 .padding(1.dp)
         )
-        var total = 0
-        for (i in data){
-            total += i.second
-        }
+
 
         Column {
             for ((index, item) in data.withIndex()) {
@@ -57,13 +68,13 @@ fun DonutChartPreview(data: List<Pair<String, Int>>) {
                             .background(color = listOfColors()[index])
                     ) {  }
                     Text(
-                        item.first,
+                        item.category,
                         modifier = Modifier.weight(1f)
                             .padding(start = 5.dp)
                     )
 
                     Text(
-                        text = String.format("%.2f", (item.second * 100f) / total) + " %"
+                        text = String.format("%.2f", (item.amount.toInt() * 100f) / total) + " %"
                     )
                 }
             }
@@ -74,8 +85,15 @@ fun DonutChartPreview(data: List<Pair<String, Int>>) {
     HorizontalDivider()
 
     Column(modifier = Modifier.padding(16.dp)) {
-        ExpenseItem("Shopping", 500, 89.92f, Color(0xFFFFC0CB), Icons.Default.ShoppingCart)
-        ExpenseItem("Food", 50, 8.99f, Color(0xFF98FB98), Icons.Default.Restaurant)
+        for ((index, item) in data.withIndex()) {
+            ExpenseItem(
+                item.category,
+                item.amount.toInt(),
+                (item.amount.toInt() * 100f) / total,
+                color.get(index),
+                Icons.Default.ShoppingCart
+            )
+        }
     }
 
 }

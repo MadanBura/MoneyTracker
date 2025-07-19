@@ -1,5 +1,6 @@
 package com.neo.moneytracker.ui.components
 
+import android.util.Log
 import android.view.ViewGroup
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -34,7 +35,7 @@ fun DonutChartWithTotal(
     modifier: Modifier = Modifier,
     data1: List<Pair<String, Int>>
 ) {
-
+    Log.d("HELLO_DATA_CHART", data1.toString())
     val entries = data1.map { PieEntry(it.second.toFloat(), it.first) }
     val colors = listOfColors().map { it.toArgb() }
     Column(

@@ -3,23 +3,25 @@ package com.neo.moneytracker.ui.screens
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.neo.moneytracker.ui.components.DonutChartPreview
 import com.neo.moneytracker.ui.components.ScrollableRow
+import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun YearScreen(modifier: Modifier = Modifier) {
+fun YearScreen(
+    transactionViewModel: TransactionViewModel,
+    modifier: Modifier = Modifier
+) {
     val allItems = remember { generateYearLabels(30) }
     ScrollableRow(allItems)
+    val data = transactionViewModel.transactions.collectAsState().value
 
-    val data = listOf(
-        "Food" to 500,
-        "Shopping" to 50
-    )
     DonutChartPreview(data)
 }
 

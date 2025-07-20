@@ -49,7 +49,7 @@ fun DonutChartWithTotal(
         AndroidView(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp), // 👈 Increased graph height
+                .height(300.dp),
             factory = { context ->
                 PieChart(context).apply {
                     layoutParams = ViewGroup.LayoutParams(

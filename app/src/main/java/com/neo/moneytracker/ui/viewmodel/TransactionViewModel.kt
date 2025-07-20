@@ -23,7 +23,6 @@ import javax.inject.Inject
 class TransactionViewModel @Inject constructor(private val transactionRepository: TransactionRepository) :
     ViewModel() {
 
-
     private val _transactions: StateFlow<List<TransactionEntity>> = transactionRepository
         .getAllTransactions()
         .map { transactionEntities ->

@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.neo.moneytracker.data.mapper.toDomainModel
 import com.neo.moneytracker.ui.components.SimpleTabLayout
 import com.neo.moneytracker.ui.theme.LemonSecondary
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
@@ -41,10 +43,13 @@ import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 fun ChartScreen() {
     val transactionViewModel: TransactionViewModel = hiltViewModel()
     var selectedTab by remember { mutableStateOf("Month") }
-
+    val tabs = listOf("Month", "Year")
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf("Expenses") }
     val options = listOf("Expenses", "Income")
+
+    val transactions by transactionViewModel.transactions.collectAsState()
+
     Scaffold(
         topBar = {
             Column(
@@ -94,8 +99,9 @@ fun ChartScreen() {
 
                 Spacer(modifier = Modifier.padding(bottom = 4.dp))
                 SimpleTabLayout(
-                    listOf("Month", "Year"), {
-                        selectedTab = it
+                    tabs = tabs,
+                    onTabSelected = { tabName ->
+                        selectedTab = tabName
                     },
                     modifier = Modifier
                         .height(40.dp)
@@ -112,8 +118,8 @@ fun ChartScreen() {
             // Main screen content below tabs
 //            ScrollableMonthRow()
             when (selectedTab) {
-                "Month" -> MonthScreen(transactionViewModel)
-                "Year" -> YearScreen(transactionViewModel)
+                "Month" -> MonthScreen(transactions)
+                "Year" -> YearScreen(transactions)
             }
         }
     }

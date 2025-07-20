@@ -81,6 +81,7 @@ fun RecordScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.White)
                 .padding(paddingValues)
         ) {
 
@@ -149,7 +150,7 @@ fun RecordScreen(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .background(Color.LightGray),
+                                        .background(Color.Transparent),
                                     horizontalArrangement = Arrangement.End,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -186,7 +187,7 @@ fun RecordScreen(
                                     modifier = Modifier
                                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                                         .fillMaxWidth()
-                                        .background(Color.White, shape = RoundedCornerShape(8.dp))
+                                        .background(Color.White, shape = RoundedCornerShape(2.dp))
                                         .padding(vertical = 8.dp, horizontal = 12.dp)
                                 ) {
                                     Row(
@@ -211,7 +212,9 @@ fun RecordScreen(
                                         )
                                     }
                                 }
+
                             }
+
                         }
                     }
                 }

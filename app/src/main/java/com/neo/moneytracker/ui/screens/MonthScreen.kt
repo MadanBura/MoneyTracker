@@ -6,6 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.neo.moneytracker.data.localDb.entities.TransactionEntity
+import com.neo.moneytracker.data.mapper.toDataEntity
+import com.neo.moneytracker.domain.model.Transaction
 import com.neo.moneytracker.ui.components.DonutChartPreview
 import com.neo.moneytracker.ui.components.ScrollableRow
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
@@ -15,15 +18,17 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MonthScreen(
-    transactionViewModel: TransactionViewModel,
+   transaction : List<TransactionEntity>,
     modifier: Modifier = Modifier
 ) {
     val allItems = remember { generateMonthLabels(30) }
     ScrollableRow(allItems)
 
-    val data = transactionViewModel.transactions.collectAsState().value
+//    val data = transactionViewModel.transactions.collectAsState().value
 
-    DonutChartPreview(data)
+    if(transaction.isNotEmpty()){
+        DonutChartPreview(transaction)
+    }
 }
 
 

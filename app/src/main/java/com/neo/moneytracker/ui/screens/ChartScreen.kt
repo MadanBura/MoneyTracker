@@ -115,8 +115,6 @@ fun ChartScreen() {
         }
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            // Main screen content below tabs
-//            ScrollableMonthRow()
             when (selectedTab) {
                 "Month" -> MonthScreen(transactions)
                 "Year" -> YearScreen(transactions)

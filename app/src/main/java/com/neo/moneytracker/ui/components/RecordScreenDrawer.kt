@@ -56,10 +56,18 @@ fun MoneyTrackerDrawerApp() {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text("VIP", color = Color(0xFFFFC107), fontSize = 10.sp)
                                     Spacer(Modifier.width(4.dp))
-                                    Icon(Icons.Default.Lock, contentDescription = "Locked", tint = Color.Gray)
+                                    Icon(
+                                        Icons.Default.Lock,
+                                        contentDescription = "Locked",
+                                        tint = Color.Gray
+                                    )
                                 }
                             } else if (title == selectedBook) {
-                                Icon(Icons.Default.Check, contentDescription = "Selected", tint = Color.Black)
+                                Icon(
+                                    Icons.Default.Check,
+                                    contentDescription = "Selected",
+                                    tint = Color.Black
+                                )
                             }
                         }
                     }
@@ -74,7 +82,9 @@ fun MoneyTrackerDrawerApp() {
                             onClick = { /* Add */ },
                             colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
                             shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.weight(1f).padding(end = 8.dp)
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp)
                         ) {
                             Text("Add")
                             Text(" VIP", color = Color(0xFFFFC107))
@@ -91,46 +101,8 @@ fun MoneyTrackerDrawerApp() {
                     }
                 }
             }
-        },
-        content = {
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = { Text("Money Tracker") },
-                        navigationIcon = {
-                            IconButton(onClick = {
-                                coroutineScope.launch { drawerState.open() }
-                            }) {
-                                Icon(Icons.Default.Menu, contentDescription = "Menu")
-                            }
-                        },
-                        actions = {
-                            IconButton(onClick = {}) {
-                                Icon(Icons.Default.Search, contentDescription = "Search")
-                            }
-                            IconButton(onClick = {}) {
-                                Icon(Icons.Default.CalendarToday, contentDescription = "Calendar")
-                            }
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color(0xFFFFD54F),
-                            titleContentColor = Color.Black,
-                            actionIconContentColor = Color.Black,
-                            navigationIconContentColor = Color.Black
-                        )
-                    )
-                },
-                content = { paddingValues ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("Selected: $selectedBook", fontWeight = FontWeight.Bold)
-                    }
-                }
-            )
         }
-    )
+    ) {
+
+    }
 }

@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.ads.mobile.sdk)
+    implementation(libs.androidx.ui.test.junit4.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -133,4 +134,13 @@ dependencies {
     implementation(libs.androidx.foundation)
 
     implementation(libs.mpandroidchart)
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.11.1")
+
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.1")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.1")
+    testImplementation("io.mockk:mockk:1.13.5")
+
+
 }

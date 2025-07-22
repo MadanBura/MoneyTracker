@@ -50,41 +50,44 @@ fun RecordScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
-    // For delete confirmation dialog state
     var transactionToDelete by remember { mutableStateOf<TransactionEntity?>(null) }
 
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Money Tracker") },
-                navigationIcon = {
-                    IconButton(onClick = { isDrawerOpen = !isDrawerOpen }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { navController.navigate(Screens.searchScreen.route) }) {
-                        Icon(Icons.Default.Search, contentDescription = "Search")
-                    }
-                    CalendarPickerButton()
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = LemonSecondary,
-                    titleContentColor = Color.Black,
-                    navigationIconContentColor = Color.Black,
-                    actionIconContentColor = Color.Black
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("Money Tracker") },
+                    navigationIcon = {
+                        IconButton(onClick = { isDrawerOpen = !isDrawerOpen }) {
+                            Icon(Icons.Default.Menu, contentDescription = "Menu")
+                        }
+                    },
+                    actions = {
+                        if (!isDrawerOpen) {
+                            IconButton(onClick = {
+                                navController.navigate(Screens.searchScreen.route)
+                            }) {
+                                Icon(Icons.Default.Search, contentDescription = "Search")
+                            }
+                            CalendarPickerButton()
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = LemonSecondary,
+                        titleContentColor = Color.Black,
+                        navigationIconContentColor = Color.Black,
+                        actionIconContentColor = Color.Black
+                    )
                 )
-            )
-        }
-    ) { paddingValues ->
+            }
 
+
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
-
             Column(modifier = Modifier.fillMaxSize()) {
 
                 if (isDrawerOpen) {
@@ -95,6 +98,7 @@ fun RecordScreen(
                             isDrawerOpen = false
                         }
                     )
+                    return@Column
                 }
 
                 Box(
@@ -114,7 +118,6 @@ fun RecordScreen(
                         .padding(16.dp)
                 ) {
                     groupedTransactions.forEach { (date, transactionsList) ->
-
                         item {
                             DailySummaryRow(date, transactionViewModel)
                             HorizontalDivider(
@@ -133,7 +136,7 @@ fun RecordScreen(
                             val coroutineScope = rememberCoroutineScope()
                             val actionWidth = 160.dp
                             val actionPx = with(LocalDensity.current) { actionWidth.toPx() }
-                            val anchors = mapOf(0f to 0, -actionPx to 1) // 0 = closed, 1 = open
+                            val anchors = mapOf(0f to 0, -actionPx to 1)
 
                             Box(
                                 modifier = Modifier
@@ -146,7 +149,6 @@ fun RecordScreen(
                                         orientation = Orientation.Horizontal
                                     )
                             ) {
-                                // Background with Edit and Delete buttons
                                 Row(
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -156,20 +158,19 @@ fun RecordScreen(
                                 ) {
                                     TextButton(
                                         onClick = {
-                                            // Navigate to edit screen or open edit dialog
                                             coroutineScope.launch { swipeableState.animateTo(0) }
                                             navController.navigate("add_screen?transactionId=${transaction.id}&isEdit=true")
                                         },
                                         modifier = Modifier
                                             .width(80.dp)
                                             .fillMaxHeight()
-                                            .background(Color(0xFFFFEB3B)) // Yellow
+                                            .background(Color(0xFFFFEB3B))
                                     ) {
                                         Text("Edit", color = Color.Black)
                                     }
+
                                     TextButton(
                                         onClick = {
-                                            // Show confirmation dialog
                                             transactionToDelete = transaction
                                             coroutineScope.launch { swipeableState.animateTo(0) }
                                         },
@@ -182,7 +183,6 @@ fun RecordScreen(
                                     }
                                 }
 
-                                // Foreground transaction content that slides
                                 Box(
                                     modifier = Modifier
                                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
@@ -212,15 +212,14 @@ fun RecordScreen(
                                         )
                                     }
                                 }
-
                             }
-
                         }
                     }
                 }
             }
         }
     }
+
 
     // Confirmation dialog outside LazyColumn so it overlays on top
     transactionToDelete?.let { transaction ->

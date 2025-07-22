@@ -28,6 +28,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -68,6 +70,9 @@ fun AddAccountScreen(
     val selectedIcon = remember { mutableStateOf(0) }
     val accountNote = remember { mutableStateOf("") }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
     val types = listOf(
         "Default",
         "Cash",
@@ -102,25 +107,20 @@ fun AddAccountScreen(
         "Credit Card (Liabilities)",
         "I owe / Payables (Liabilities)"
     )
-    val liabilities= selectedType.value in liabilityTypes
+    val liabilities = selectedType.value in liabilityTypes
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
                         Text("Add")
                     }
                 },
                 navigationIcon = {
-//                    IconButton(onClick = { navController.popBackStack() }) {
-//                        Icon(Icons.Default.Close, contentDescription = "Cancel")
-//                    }
-//
                     Text(
                         "Cancel",
                         modifier = Modifier.clickable { navController.popBackStack() }
@@ -128,20 +128,46 @@ fun AddAccountScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            accountViewModel.addAccount(
-                                AddAccount(
-                                    accountName = accountName.value,
-                                    type = selectedType.value,
-                                    currency = selectedCurrency.value,
-                                    amount = amount.value.toLong(),
-                                    icon = selectedIcon.value,
-                                    liabilities = liabilities,
-                                    note = accountNote.value
-                                )
-                            )
-                            delay(1000)
-                            navController.popBackStack()
+                        // ✅ Validation logic
+                        when {
+                            accountName.value.isBlank() -> {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("Account name is required")
+                                }
+                            }
+                            amount.value.isBlank() -> {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("Amount is required")
+                                }
+                            }
+                            amount.value.toLongOrNull() == null -> {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("Enter a valid numeric amount")
+                                }
+                            }
+                            selectedIcon.value !in icons.indices -> {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("Please select an icon")
+                                }
+                            }
+                            else -> {
+                                // ✅ Save the account
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    accountViewModel.addAccount(
+                                        AddAccount(
+                                            accountName = accountName.value,
+                                            type = selectedType.value,
+                                            currency = selectedCurrency.value,
+                                            amount = amount.value.toLong(),
+                                            icon = selectedIcon.value,
+                                            liabilities = liabilities,
+                                            note = accountNote.value
+                                        )
+                                    )
+                                    delay(1000)
+                                    navController.popBackStack()
+                                }
+                            }
                         }
                     }) {
                         Icon(Icons.Default.Check, contentDescription = "Save")
@@ -151,6 +177,9 @@ fun AddAccountScreen(
                     containerColor = Color(0xFFFFD54F)
                 )
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { paddingValues ->
         Column(
@@ -160,6 +189,7 @@ fun AddAccountScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
             LabeledTextField("Account name", accountName.value) {
                 accountName.value = it
             }

@@ -11,6 +11,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.material3.*
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.neo.moneytracker.data.localDb.entities.TransactionEntity
 import com.neo.moneytracker.data.mapper.toDomainModel
@@ -36,7 +38,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun RecordScreen(
-    navController: NavHostController,
+    navController: NavController,
     transactionViewModel: TransactionViewModel
 ) {
     var isDrawerOpen by remember { mutableStateOf(false) }
@@ -272,7 +274,7 @@ private fun DrawerSection(
                     .padding(vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Default.Book, contentDescription = null)
+                Icon(Icons.Outlined.Build, contentDescription = null)
                 Spacer(Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(title, fontWeight = FontWeight.Bold)

@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -114,7 +113,8 @@ fun AmountInputDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = 4.dp)
-                        .background(Color.Transparent),
+                        .background(Color.Transparent)
+                        ,
                     textStyle = TextStyle(
                         fontSize = 34.sp,
                         fontWeight = FontWeight.Normal,
@@ -398,7 +398,7 @@ fun AccountBottomSheet(
                         .background(Color(0xFFFFD54F), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Outlined.Badge, contentDescription = null, tint = Color.Black)
+                    Icon(Icons.Default.Check, contentDescription = null, tint = Color.Black)
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))

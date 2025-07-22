@@ -41,6 +41,7 @@ fun RecordScreen(
 ) {
     var isDrawerOpen by remember { mutableStateOf(false) }
     var selectedBook by remember { mutableStateOf("Default") }
+    var isCalendarVisible by remember { mutableStateOf(false) }
 
     val transactionList by transactionViewModel.transactions.collectAsState(initial = emptyList())
     val groupedTransactions = transactionList.groupBy { it.date }
@@ -68,7 +69,12 @@ fun RecordScreen(
                             }) {
                                 Icon(Icons.Default.Search, contentDescription = "Search")
                             }
-                            CalendarPickerButton()
+                            IconButton(onClick = {
+                                isCalendarVisible = true
+                            }) {
+                                Icon(Icons.Default.CalendarToday, contentDescription = "Calendar")
+                            }
+
                         }
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -219,9 +225,21 @@ fun RecordScreen(
             }
         }
     }
+    if (isCalendarVisible) {
+        CustomCalendarDialog(
+            onDateSelected = { selectedDate ->
+                isCalendarVisible = false
+            },
+            onDismiss = {
+                isCalendarVisible = false
+            },
+            isCompact = true
+        )
+    }
 
 
-    // Confirmation dialog outside LazyColumn so it overlays on top
+
+
     transactionToDelete?.let { transaction ->
         AlertDialog(
             onDismissRequest = { transactionToDelete = null },

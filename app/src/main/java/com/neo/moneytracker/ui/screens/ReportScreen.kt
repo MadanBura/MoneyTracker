@@ -51,7 +51,6 @@ fun ReportScreen(
                     .background(LemonSecondary)
                     .padding(horizontal = 8.dp, vertical = 8.dp)
             ) {
-                // Title (Reports)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()

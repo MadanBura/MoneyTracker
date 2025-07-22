@@ -128,7 +128,6 @@ fun AddAccountScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        // ✅ Validation logic
                         when {
                             accountName.value.isBlank() -> {
                                 coroutineScope.launch {
@@ -151,7 +150,6 @@ fun AddAccountScreen(
                                 }
                             }
                             else -> {
-                                // ✅ Save the account
                                 CoroutineScope(Dispatchers.Main).launch {
                                     accountViewModel.addAccount(
                                         AddAccount(

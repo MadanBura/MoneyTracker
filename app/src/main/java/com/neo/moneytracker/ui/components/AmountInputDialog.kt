@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -114,7 +115,7 @@ fun AmountInputDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = 4.dp)
-                        .background(Color.Transparent),
+                        .background(Color.Transparent).testTag("AmountField"),
                     textStyle = TextStyle(
                         fontSize = 34.sp,
                         fontWeight = FontWeight.Normal,
@@ -180,7 +181,7 @@ fun AmountInputDialog(
                     placeholder = { Text("Enter a note", color = Color.Gray) },
                     modifier = Modifier
                         .weight(1f)
-                        .align(Alignment.CenterVertically),
+                        .align(Alignment.CenterVertically).testTag("NoteField"),
                     singleLine = true,
                     colors = NewTextFieldDefaults.colors(
                         unfocusedContainerColor = Color.White,

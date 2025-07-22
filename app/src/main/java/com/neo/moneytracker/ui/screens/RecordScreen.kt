@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -30,7 +31,9 @@ import com.neo.moneytracker.ui.components.*
 import com.neo.moneytracker.ui.navigation.Screens
 import com.neo.moneytracker.ui.theme.LemonSecondary
 import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.nio.file.WatchEvent
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
@@ -156,11 +159,11 @@ fun RecordScreen(
                                 ) {
                                     TextButton(
                                         onClick = {
-                                            // Navigate to edit screen or open edit dialog
                                             coroutineScope.launch { swipeableState.animateTo(0) }
                                             navController.navigate("add_screen?transactionId=${transaction.id}&isEdit=true")
                                         },
                                         modifier = Modifier
+                                            .testTag("DeleteButton_${transaction.category}_${transaction.amount}")
                                             .width(80.dp)
                                             .fillMaxHeight()
                                             .background(Color(0xFFFFEB3B)) // Yellow
@@ -185,7 +188,13 @@ fun RecordScreen(
                                 // Foreground transaction content that slides
                                 Box(
                                     modifier = Modifier
-                                        .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                                        .testTag("TransactionItem_${transaction.category}_${transaction.amount}")
+                                        .offset {
+                                            IntOffset(
+                                                swipeableState.offset.value.roundToInt(),
+                                                0
+                                            )
+                                        }
                                         .fillMaxWidth()
                                         .background(Color.White, shape = RoundedCornerShape(2.dp))
                                         .padding(vertical = 8.dp, horizontal = 12.dp)
@@ -225,16 +234,27 @@ fun RecordScreen(
     // Confirmation dialog outside LazyColumn so it overlays on top
     transactionToDelete?.let { transaction ->
         AlertDialog(
+            modifier = Modifier.testTag("DeleteDialog"),
             onDismissRequest = { transactionToDelete = null },
             title = { Text("Confirm Deletion") },
-            text = { Text("Are you sure you want to delete \"${transaction.category}\" of ₹${transaction.amount}?") },
+            text = {
+                Text(
+                    text = "Are you sure you want to delete \"${transaction.category}\" of ₹${transaction.amount.toInt()}?",
+                    modifier = Modifier.testTag("DeleteConfirmationText")
+                )
+            }
+            ,
             confirmButton = {
-                TextButton(onClick = {
-                    coroutineScope.launch {
-                        transactionViewModel.deleteTransaction(transaction.id)
-                        transactionToDelete = null
-                    }
-                }) {
+                TextButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            transactionViewModel.deleteTransaction(transaction.id)
+                            delay(300)
+                            transactionToDelete = null
+                        }
+                    },
+                    modifier = Modifier.testTag("ConfirmButton")
+                ) {
                     Text("Delete")
                 }
             },

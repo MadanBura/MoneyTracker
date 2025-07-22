@@ -9,6 +9,7 @@ import com.neo.moneytracker.data.localDb.entities.TransactionEntity
 import com.neo.moneytracker.data.mapper.toDataEntity
 import com.neo.moneytracker.data.mapper.toDomainModel
 import com.neo.moneytracker.domain.repository.TransactionRepository
+import com.neo.moneytracker.domain.usecase.AddTransactionUseCase
 import com.neo.moneytracker.domain.usecase.CalculateTotalUseCase
 import com.neo.moneytracker.domain.usecase.DateWiseTotalUseCase
 import com.neo.moneytracker.domain.usecase.GetTransactionsUseCase
@@ -27,6 +28,7 @@ class TransactionViewModel @Inject constructor(
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val calculateTotalsUseCase: CalculateTotalUseCase,
     private val dateWiseTotalUseCase: DateWiseTotalUseCase,
+    private val useCase: AddTransactionUseCase,
     private val repository: TransactionRepository
 ) : ViewModel() {
 
@@ -50,7 +52,7 @@ class TransactionViewModel @Inject constructor(
 
     fun addTransaction(transaction: TransactionEntity) {
         viewModelScope.launch {
-            repository.addTransaction(transaction.toDomainModel())
+            useCase(transaction.toDomainModel())
         }
     }
 

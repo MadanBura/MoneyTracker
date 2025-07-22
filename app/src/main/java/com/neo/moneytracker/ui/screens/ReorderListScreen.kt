@@ -51,7 +51,7 @@ fun ReorderableListScreen(addAccountViewModel: AccountsViewModel, navHostControl
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 4.dp)
-                    .animateItemPlacement()
+//                    .animateItemPlacement()
                     .then(
                         if (isDragging) Modifier
                             .shadow(8.dp, shape = MaterialTheme.shapes.medium)

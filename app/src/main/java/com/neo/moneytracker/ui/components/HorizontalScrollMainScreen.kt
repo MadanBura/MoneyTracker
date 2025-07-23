@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.neo.moneytracker.ui.theme.LemonSecondary
 import kotlin.math.exp
@@ -89,6 +90,12 @@ fun StickyFirstWithLazyRow(expenseAmount: Int, incomeAmount: Int) {
                                 "Income" -> "${incomeAmount}"
                                 "Balance" -> "${incomeAmount - expenseAmount}"
                                 else -> "0"
+                            } ,
+                            modifier = when (category) {
+                                "Expenses" -> Modifier.testTag("ExpensesField")
+                                "Income" -> Modifier.testTag("IncomeField")
+                                "Balance" -> Modifier.testTag("BalanceField")
+                                else -> Modifier
                             }
                         )
                     }

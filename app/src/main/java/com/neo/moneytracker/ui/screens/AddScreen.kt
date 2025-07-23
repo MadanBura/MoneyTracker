@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -16,7 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -211,7 +214,12 @@ fun SubcategoryGridScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .padding(4.dp)
-                    .clickable { onSubcategoryClick(name, iconRes) }
+                    .selectable(
+                        selected = isSelected,
+                        onClick = { onSubcategoryClick(name, iconRes) },
+                        role = Role.Image
+                    )
+                    .testTag("subcategory$name")
             ) {
                 Box(
                     modifier = Modifier
@@ -226,6 +234,7 @@ fun SubcategoryGridScreen(
                         painter = painterResource(id = iconRes),
                         contentDescription = name,
                         modifier = Modifier.size(28.dp)
+
                     )
                 }
 

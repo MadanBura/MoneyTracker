@@ -54,6 +54,7 @@ fun ReorderableSubCategoryList(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 4.dp)
+//                    .animateItemPlacement()
                     .then(
                         if (isDragging) Modifier
                             .shadow(8.dp, shape = MaterialTheme.shapes.medium)
@@ -114,12 +115,8 @@ fun ReorderableSubCategoryList(
                                         dragOffsetY.value += dragAmount.y
 
                                         val moveBy = (dragOffsetY.value / itemHeightPx).toInt()
-                                        val fromIndex = draggedItemIndex.value
-                                            ?: return@detectDragGesturesAfterLongPress
-                                        val toIndex = (fromIndex + moveBy).coerceIn(
-                                            0,
-                                            subcategories.lastIndex
-                                        )
+                                        val fromIndex = draggedItemIndex.value ?: return@detectDragGesturesAfterLongPress
+                                        val toIndex = (fromIndex + moveBy).coerceIn(0, subcategories.lastIndex)
 
                                         if (fromIndex != toIndex) {
                                             onReorder(fromIndex, toIndex)

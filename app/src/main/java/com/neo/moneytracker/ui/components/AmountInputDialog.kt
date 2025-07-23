@@ -322,7 +322,8 @@ fun AmountInputDialog(
                 onDismiss = { showCalendar = false },
                 onDateSelected = { selected ->
                     selectedDate = selected
-                }
+                },
+                isCompact = true
             )
         }
     }

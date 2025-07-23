@@ -1,46 +1,13 @@
 package com.neo.moneytracker.ui.screens
 
-import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.assertHasClickAction
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsSelected
-import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.hasClickAction
-import androidx.compose.ui.test.hasContentDescription
-import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.isDisplayed
-import androidx.compose.ui.test.isNotDisplayed
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.test.onChild
-import androidx.compose.ui.test.onFirst
-import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
-import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.swipeLeft
-import androidx.navigation.compose.rememberNavController
 import com.neo.moneytracker.base.MainActivity
-import com.neo.moneytracker.data.localDb.entities.TransactionEntity
-import com.neo.moneytracker.domain.repository.TransactionRepository
-import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
-import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import com.neo.moneytracker.R
-import com.neo.moneytracker.data.mapper.toDomainModel
 
 @Config(sdk = [34])
 @RunWith(RobolectricTestRunner::class)
@@ -56,36 +23,37 @@ class RecordScreenUiTest {
 
         composeRule.onNodeWithContentDescription("Search")
             .assertIsDisplayed()
-
     }
 
     @Test
-    fun recordScreen_drawerOpensOnMenuClick() {
-
+    fun recordScreen_addAndDeleteTransaction() {
+        // Open Add Transaction screen
         composeRule.onNodeWithContentDescription("Add").performClick()
 
-
+        // Select Expense
         composeRule.onNodeWithText("expenses")
             .assertIsDisplayed()
+            .performClick()
 
-        composeRule.onNodeWithText("expenses").performClick()
-
+        // Select Category
         composeRule.onNodeWithContentDescription("Groceries")
             .assertIsDisplayed()
-        composeRule.onNodeWithContentDescription("Groceries").performClick()
+            .performClick()
 
+        // Verify subcategory selection
         composeRule.onNodeWithTag("subcategoryGroceries")
             .assertIsSelected()
 
+        // Enter Amount
         composeRule.onNodeWithTag("AmountField")
             .assertExists()
             .performTextInput("500")
 
         composeRule.onNodeWithText("500")
             .assertIsDisplayed()
+            .assertTextEquals("500")
 
-        composeRule.onNodeWithText("500").assertTextEquals("500")
-
+        // Enter Note
         composeRule.onNodeWithTag("NoteField")
             .assertExists()
             .performTextInput("Monthly groceries")
@@ -93,79 +61,52 @@ class RecordScreenUiTest {
         composeRule.onNodeWithText("Monthly groceries")
             .assertIsDisplayed()
 
+        // Submit Transaction
         composeRule.onNodeWithContentDescription("Check Icon")
             .assertExists()
             .assertIsDisplayed()
             .performClick()
 
+        // Wait for balance to update
         composeRule.waitUntil(timeoutMillis = 4_000) {
             composeRule.onAllNodesWithTag("BalanceField").fetchSemanticsNodes().isNotEmpty()
         }
 
+        // Verify balance
         composeRule.onNodeWithTag("BalanceField")
             .assertIsDisplayed()
             .assertTextEquals("-500")
 
+        // Swipe transaction item to reveal delete
         composeRule.onNodeWithTag("TransactionItem_Groceries_500")
             .assertExists()
             .performTouchInput {
                 swipeLeft()
             }
 
-/*
-        composeRule.onNodeWithText("DeleteButton_Groceries_500")
-            .isDisplayed()
-*/
-
-        /*composeRule.onNodeWithTag("DeleteButton_Groceries_500")
-            .assertExists()
-            .performClick()*/
-
-        composeRule.onNodeWithTag("DeleteButton_Groceries_500").assertIsDisplayed()
-        val node = composeRule.onNodeWithTag("DeleteButton_Groceries_500")
-
-        node.performClick()
-
-        composeRule.onNodeWithTag("DeleteButton_Groceries_500").isNotDisplayed()
-        composeRule.waitForIdle()
-        composeRule.onNodeWithTag("DeleteDialog").assertExists()
-
-      /*  composeRule.onNodeWithText("Confirm Deletion")
-            .assertIsDisplayed()
-            //.isDisplayed()*/
-
-      //  composeRule.onNode(hasText("Confirm Deletion") and hasClickAction()).assertExists().performClick()
-
-       /* composeRule.onNodeWithTag("ConfirmButton")
-            .isDisplayed()*/
-
-       /* composeRule.onNodeWithTag("ConfirmButton")
-            .assertExists()
-            .performClick()*/
-
-
-
-
-      /*  composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithTag("DeleteButton_Groceries_500").fetchSemanticsNodes().isNotEmpty()
-        }
+        // Click delete button
         composeRule.onNodeWithTag("DeleteButton_Groceries_500")
-            .assertExists()
+            .assertIsDisplayed()
             .performClick()
 
-
+        // Confirm delete dialog shows
         composeRule.onNodeWithTag("DeleteDialog")
-            .onChild()
-            .assert(hasText("Confirm Deletion"))
+            .assertExists()
+
+        // Click Confirm (You must make sure this button has tag "ConfirmButton" in your UI)
+        composeRule.onNodeWithTag("ConfirmButton")
             .assertIsDisplayed()
+            .performClick()
 
-*/
+        composeRule.waitUntil(5_000){
+            composeRule.onAllNodesWithTag("TransactionItem_Groceries_500").fetchSemanticsNodes().isEmpty()
+        }
 
+        composeRule.onNodeWithTag("TransactionItem_Groceries_500").assertDoesNotExist()
 
+        composeRule.onNodeWithTag("BalanceField").assertIsDisplayed().assertTextEquals("0")
 
-
-
+        // Optionally: Check item is removed (requires test data revalidation)
+        // composeRule.onNodeWithTag("TransactionItem_Groceries_500").assertDoesNotExist()
     }
-
-
 }

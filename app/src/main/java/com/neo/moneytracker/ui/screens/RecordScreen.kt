@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.SwipeableState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.rememberSwipeableState
@@ -17,6 +18,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -24,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.neo.moneytracker.data.localDb.entities.TransactionEntity
 import com.neo.moneytracker.data.mapper.toDomainModel
@@ -36,25 +39,27 @@ import kotlinx.coroutines.launch
 import java.nio.file.WatchEvent
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun RecordScreen(
-    navController: NavHostController,
+    navController: NavController,
     transactionViewModel: TransactionViewModel
 ) {
     var isDrawerOpen by remember { mutableStateOf(false) }
     var selectedBook by remember { mutableStateOf("Default") }
 
-    val transactionList by transactionViewModel.transactions.collectAsState(initial = emptyList())
-    val groupedTransactions = transactionList.groupBy { it.date }
-
-    val totalIncomeAmount by transactionViewModel.incomeTotalAmount.collectAsState()
+    val transactions by transactionViewModel.transactions.collectAsState()
+    val incomeAmount by transactionViewModel.incomeTotalAmount.collectAsState()
     val expenseAmount by transactionViewModel.expensesTotalAmount.collectAsState()
 
-    val coroutineScope = rememberCoroutineScope()
+    val groupedTransactions = transactions.groupBy { it.date }
 
-    // For delete confirmation dialog state
+    val coroutineScope = rememberCoroutineScope()
+    val swipeStates = remember { mutableStateMapOf<Int, SwipeableState<Int>>() }
+
     var transactionToDelete by remember { mutableStateOf<TransactionEntity?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -81,191 +86,183 @@ fun RecordScreen(
         }
     ) { paddingValues ->
 
-        Box(
+        if (isDrawerOpen) {
+            DrawerSection(
+                selectedBook = selectedBook,
+                onSelectBook = {
+                    selectedBook = it
+                    isDrawerOpen = false
+                }
+            )
+        }
+
+        Column(
             modifier = Modifier
-                .fillMaxSize()
                 .background(Color.White)
+                .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            Box(
+                modifier = Modifier
+                    .background(LemonSecondary)
+                    .fillMaxWidth()
+            ) {
+                StickyFirstWithLazyRow(
+                    incomeAmount = incomeAmount.toInt(),
+                    expenseAmount = expenseAmount.toInt()
+                )
+            }
 
-            Column(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                groupedTransactions.forEach { (date, txList) ->
+                    item {
+                        DailySummaryRow(date, transactionViewModel)
+                        Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    }
 
-                if (isDrawerOpen) {
-                    DrawerSection(
-                        selectedBook = selectedBook,
-                        onSelectBook = {
-                            selectedBook = it
-                            isDrawerOpen = false
-                        }
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .background(LemonSecondary)
-                        .fillMaxWidth()
-                ) {
-                    StickyFirstWithLazyRow(
-                        expenseAmount = expenseAmount.toInt(),
-                        incomeAmount = totalIncomeAmount.toInt()
-                    )
-                }
-
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    groupedTransactions.forEach { (date, transactionsList) ->
-
-                        item {
-                            DailySummaryRow(date, transactionViewModel)
-                            HorizontalDivider(
-                                color = Color.LightGray,
-                                thickness = 1.dp,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
+                    items(txList, key = { it.id }) { transaction ->
+                        val swipeState = swipeStates.getOrPut(transaction.id) {
+                            rememberSwipeableState(0)
                         }
 
-                        items(
-                            items = transactionsList,
-                            key = { if (it.id != 0) it.id else it.hashCode() }
-                        ) { transaction ->
+                        val actionWidth = 160.dp
+                        val actionPx = with(LocalDensity.current) { actionWidth.toPx() }
+                        val anchors = mapOf(0f to 0, -actionPx to 1)
 
-                            val swipeableState = rememberSwipeableState(0)
-                            val coroutineScope = rememberCoroutineScope()
-                            val actionWidth = 160.dp
-                            val actionPx = with(LocalDensity.current) { actionWidth.toPx() }
-                            val anchors = mapOf(0f to 0, -actionPx to 1) // 0 = closed, 1 = open
-
-                            Box(
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .swipeable(
+                                    state = swipeState,
+                                    anchors = anchors,
+                                    thresholds = { _, _ -> FractionalThreshold(0.3f) },
+                                    orientation = Orientation.Horizontal
+                                )
+                        ) {
+                            // Swipe background
+                            Row(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp)
-                                    .swipeable(
-                                        state = swipeableState,
-                                        anchors = anchors,
-                                        thresholds = { _, _ -> FractionalThreshold(0.3f) },
-                                        orientation = Orientation.Horizontal
-                                    )
+                                    .fillMaxSize()
+                                    .background(Color.White),
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                // Background with Edit and Delete buttons
-                                Row(
+                                TextButton(
+                                    onClick = {
+                                        coroutineScope.launch { swipeState.animateTo(0) }
+                                        navController.navigate("add_screen?transactionId=${transaction.id}&isEdit=true")
+                                    },
                                     modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(Color.Transparent),
-                                    horizontalArrangement = Arrangement.End,
-                                    verticalAlignment = Alignment.CenterVertically
+                                        .width(80.dp)
+                                        .fillMaxHeight()
+                                        .background(Color(0xFFFFEB3B))
                                 ) {
-                                    TextButton(
-                                        onClick = {
-                                            coroutineScope.launch { swipeableState.animateTo(0) }
-                                            navController.navigate("add_screen?transactionId=${transaction.id}&isEdit=true")
-                                        },
-                                        modifier = Modifier
-                                            .testTag("DeleteButton_${transaction.category}_${transaction.amount}")
-                                            .width(80.dp)
-                                            .fillMaxHeight()
-                                            .background(Color(0xFFFFEB3B)) // Yellow
-                                    ) {
-                                        Text("Edit", color = Color.Black)
-                                    }
-                                    TextButton(
-                                        onClick = {
-                                            // Show confirmation dialog
-                                            transactionToDelete = transaction
-                                            coroutineScope.launch { swipeableState.animateTo(0) }
-                                        },
-                                        modifier = Modifier
-                                            .width(80.dp)
-                                            .fillMaxHeight()
-                                            .background(Color.Red)
-                                    ) {
-                                        Text("Delete", color = Color.White)
-                                    }
+                                    Text("Edit", color = Color.Black)
                                 }
-
-                                // Foreground transaction content that slides
-                                Box(
+                                TextButton(
+                                    onClick = {
+                                        transactionToDelete = transaction
+                                        showDeleteDialog = true
+                                        coroutineScope.launch { swipeState.animateTo(0) }
+                                    },
                                     modifier = Modifier
-                                        .testTag("TransactionItem_${transaction.category}_${transaction.amount}")
-                                        .offset {
-                                            IntOffset(
-                                                swipeableState.offset.value.roundToInt(),
-                                                0
-                                            )
-                                        }
-                                        .fillMaxWidth()
-                                        .background(Color.White, shape = RoundedCornerShape(2.dp))
-                                        .padding(vertical = 8.dp, horizontal = 12.dp)
+                                        .testTag("DeleteButton_${transaction.category}_${transaction.amount}")
+                                        .width(80.dp)
+                                        .fillMaxHeight()
+                                        .background(Color.Red)
                                 ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        TransactionIcon(transaction.toDomainModel())
-                                        Column(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .padding(start = 8.dp)
-                                        ) {
-                                            Text(
-                                                text = transaction.category,
-                                                fontSize = 14.sp,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                        }
-                                        Text(
-                                            text = "₹${transaction.amount}",
-                                            fontSize = 16.sp,
-                                            modifier = Modifier.padding(start = 8.dp)
-                                        )
-                                    }
+                                    Text("Delete", color = Color.White)
                                 }
-
                             }
 
+                            // Swipeable Foreground
+                            Box(
+                                modifier = Modifier
+                                    .testTag("TransactionItem_${transaction.category}_${transaction.amount}")
+                                    .offset { IntOffset(swipeState.offset.value.roundToInt(), 0) }
+                                    .fillMaxWidth()
+                                    .background(Color.White, shape = RoundedCornerShape(2.dp))
+                                    .padding(12.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    TransactionIcon(transaction.toDomainModel())
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(start = 8.dp)
+                                    ) {
+                                        Text(
+                                            text = transaction.category,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 14.sp
+                                        )
+                                    }
+                                    Text(
+                                        text = "₹${transaction.amount}",
+                                        fontSize = 16.sp
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
-    // Confirmation dialog outside LazyColumn so it overlays on top
-    transactionToDelete?.let { transaction ->
-        AlertDialog(
-            modifier = Modifier.testTag("DeleteDialog"),
-            onDismissRequest = { transactionToDelete = null },
-            title = { Text("Confirm Deletion") },
-            text = {
-                Text(
-                    text = "Are you sure you want to delete \"${transaction.category}\" of ₹${transaction.amount.toInt()}?",
-                    modifier = Modifier.testTag("DeleteConfirmationText")
-                )
-            }
-            ,
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            transactionViewModel.deleteTransaction(transaction.id)
-                            delay(300)
-                            transactionToDelete = null
+        // Delete confirmation dialog
+        if (showDeleteDialog && transactionToDelete != null) {
+            AlertDialog(
+                modifier = Modifier.testTag("DeleteDialog"),
+                onDismissRequest = {
+                    showDeleteDialog = false
+                    coroutineScope.launch {
+                        swipeStates[transactionToDelete!!.id]?.animateTo(0)
+                    }
+                    transactionToDelete = null
+                },
+                title = { Text("Delete Transaction") },
+                text = {
+                    Text("Are you sure you want to delete \"${transactionToDelete!!.category}\" of ₹${transactionToDelete!!.amount}?")
+                },
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier.testTag("ConfirmButton"),
+                        onClick = {
+                            coroutineScope.launch {
+                                transactionViewModel.deleteTransaction(transactionToDelete!!.id)
+                                delay(250)
+                                swipeStates.remove(transactionToDelete!!.id)
+                                transactionToDelete = null
+                                showDeleteDialog = false
+                            }
                         }
-                    },
-                    modifier = Modifier.testTag("ConfirmButton")
-                ) {
-                    Text("Delete")
+                    ) {
+                        Text("Delete")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                swipeStates[transactionToDelete!!.id]?.animateTo(0)
+                            }
+                            transactionToDelete = null
+                            showDeleteDialog = false
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = { transactionToDelete = null }) {
-                    Text("Cancel")
-                }
-            }
-        )
+            )
+        }
     }
 }
+
+
 
 @Composable
 private fun DrawerSection(
@@ -281,7 +278,7 @@ private fun DrawerSection(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(Color.Transparent)
             .padding(16.dp)
     ) {
         drawerItems.forEach { (title, subtitle, isVp) ->

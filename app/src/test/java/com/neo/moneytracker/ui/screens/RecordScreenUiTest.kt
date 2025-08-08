@@ -106,7 +106,5 @@ class RecordScreenUiTest {
 
         composeRule.onNodeWithTag("BalanceField").assertIsDisplayed().assertTextEquals("0")
 
-        // Optionally: Check item is removed (requires test data revalidation)
-        // composeRule.onNodeWithTag("TransactionItem_Groceries_500").assertDoesNotExist()
     }
 }

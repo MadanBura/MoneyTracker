@@ -1,10 +1,90 @@
 package com.neo.moneytracker.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.collectAsState
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.neo.moneytracker.ui.components.SimpleTabLayout
+import com.neo.moneytracker.ui.theme.LemonSecondary
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
+import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReportScreen() {
-    Text("ReportScreen")
+fun ReportScreen(
+    navController: NavHostController,
+    accountViewModel: AccountsViewModel,
+    transactionViewModel: TransactionViewModel
+) {
+    val totalIncomeAmount = transactionViewModel.incomeTotalAmount.collectAsState().value
+    val expenseAmount = transactionViewModel.expensesTotalAmount.collectAsState().value
+
+    var selectedTab by remember { mutableStateOf("Analytics") }
+
+    Scaffold(
+        topBar = {
+            Column(
+                modifier = Modifier
+                    .background(LemonSecondary)
+                    .padding(horizontal = 8.dp, vertical = 8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, bottom = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Reports",
+                        color = Color.Black,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.padding(bottom = 4.dp))
+                SimpleTabLayout(listOf("Analytics", "Accounts"),{
+                    selectedTab = it
+                },
+                    modifier = Modifier
+                        .height(40.dp)
+                        .background(color = LemonSecondary)
+                        .padding(horizontal = 16.dp, vertical = 2.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(1.dp, Color.Black, RoundedCornerShape(12.dp))
+                )
+                Spacer(modifier = Modifier.padding(bottom = 6.dp))
+            }
+        }
+    ) { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
+            when(selectedTab){
+                "Analytics" -> AnalyticsScreen(expenseAmount, totalIncomeAmount)
+                "Accounts" -> AccountsScreen(navController, accountViewModel)
+            }
+        }
+    }
 }

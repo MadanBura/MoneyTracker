@@ -33,11 +33,28 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
     kotlinOptions {
         jvmTarget = "11"
     }
     buildFeatures {
         compose = true
+    }
+    packaging {
+        resources {
+            excludes += setOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md",
+                "META-INF/NOTICE.md",
+                "META-INF/DEPENDENCIES",
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1"
+            )
+        }
     }
 }
 
@@ -51,6 +68,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.ads.mobile.sdk)
+    implementation(libs.androidx.ui.test.junit4.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -58,59 +78,111 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.material)
 
+    //for system status bar
 
+//    implementation("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
 //    Navigation
     val nav_version = "2.9.0"
-    implementation("androidx.navigation:navigation-compose:$nav_version")
+    implementation(libs.androidx.navigation.compose)
 
 //    DaggerHilt
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
 
     //    Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
 
     //    Room Dependency
     val room_version = "2.6.1"
-    implementation("androidx.room:room-runtime:$room_version")
-    kapt("androidx.room:room-compiler:$room_version")
-    implementation("androidx.room:room-ktx:$room_version")
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
 
 
 //    Coroutine
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
 
 
 //    LifeCycle
     val lifecycle_version = "2.8.6"
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
 //    Glide
-    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.glide)
 
 //    Coil
-    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation(libs.coil.compose)
 
 //    Material Icon
-    implementation("androidx.compose.material:material-icons-extended:1.6.1")
+    implementation(libs.androidx.material.icons.extended)
 
 
-    implementation("io.coil-kt:coil-gif:2.4.0")
+    implementation(libs.coil.gif)
 
 
 //    Google Fonts
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.0")
+    implementation(libs.androidx.ui.text.google.fonts)
 
-    implementation ("com.google.maps.android:maps-compose:2.11.4")
-    implementation ("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation (libs.maps.compose)
+    implementation (libs.play.services.maps)
+    implementation(libs.play.services.location)
+
+
+    implementation(libs.androidx.core.splashscreen.v100)
+
+    implementation(libs.androidx.material)
+
+    implementation(platform(libs.androidx.compose.bom.v20240500))
+    implementation(libs.androidx.compose.material3.material3)
+
+    implementation(libs.androidx.compose.material3.material3)
+
+
+    implementation(libs.androidx.foundation)
+
+    implementation(libs.mpandroidchart)
+
+    // Unit Testing
+    androidTestImplementation("junit:junit:4.13.2")
+    testImplementation("junit:junit:4.13.2")
+
+    // Coroutine Test
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // Mocking
+    testImplementation("io.mockk:mockk:1.13.5")
+    androidTestImplementation("io.mockk:mockk:1.13.5")
+
+    // For using Truth assertions (optional)
+    testImplementation("com.google.truth:truth:1.1.5")
+
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.8.3")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.8.3")
+
+    testImplementation("org.robolectric:robolectric:4.13")
+
+    androidTestImplementation("org.robolectric:robolectric:4.13")
+
+
+    testImplementation("com.google.dagger:hilt-android-testing:2.48")
+    kaptAndroidTest("com.google.dagger:hilt-compiler:2.48")
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.11.1")
+
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.1")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.1")
+    testImplementation("io.mockk:mockk:1.13.5")
+
+
 }

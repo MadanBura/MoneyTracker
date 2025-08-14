@@ -233,7 +233,7 @@ fun AmountInputDialog(
                                         val transaction = when(selectedCategory){
                                             expensesLabel ->{
                                                 Transaction(
-                       F                             id =0,
+                                                    id =0,
                                                     iconRes = iconRes,
                                                     amount = amount,
                                                     note = note,

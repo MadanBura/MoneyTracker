@@ -21,6 +21,25 @@ import javax.inject.Inject
 class AccountsViewModel @Inject constructor(
     private val useCase: AccountDataUseCase
 ): ViewModel() {
+
+    init {
+        getAccounts()
+    }
+
+    private val _assets = MutableStateFlow(0L)
+    val assets: StateFlow<Long> = _assets
+
+    private val _liabilities = MutableStateFlow(0L)
+    val liabilities: StateFlow<Long> = _liabilities
+
+    val netWorth: StateFlow<Long> = MutableStateFlow(0L)
+
+    private val _accounts = MutableStateFlow<List<AddAccountEntity>>(emptyList())
+    val accounts: StateFlow<List<AddAccountEntity>> = _accounts
+
+    private val _singleAccount = MutableStateFlow<AddAccountEntity?>(null)
+    val singleAccount: StateFlow<AddAccountEntity?> = _singleAccount
+
     fun addAccount(account: AddAccount){
         viewModelScope.launch{
             useCase.addAccount(account)
@@ -34,12 +53,6 @@ class AccountsViewModel @Inject constructor(
         _accounts.value = currentList
     }
 
-
-    init {
-        getAccounts()
-    }
-    private val _accounts = MutableStateFlow<List<AddAccountEntity>>(emptyList())
-    val accounts: StateFlow<List<AddAccountEntity>> = _accounts
 
     private fun getAccounts() {
         viewModelScope.launch {
@@ -63,13 +76,6 @@ class AccountsViewModel @Inject constructor(
         }
     }
 
-    private val _assets = MutableStateFlow(0L)
-    val assets: StateFlow<Long> = _assets
-
-    private val _liabilities = MutableStateFlow(0L)
-    val liabilities: StateFlow<Long> = _liabilities
-
-    val netWorth: StateFlow<Long> = MutableStateFlow(0L)
 
     private fun calculateAssetsAndLiabilities(list: List<AddAccountEntity>) {
         var assets = 0L
@@ -86,8 +92,6 @@ class AccountsViewModel @Inject constructor(
         (netWorth as MutableStateFlow).value = assets - liabilities
     }
 
-    private val _singleAccount = MutableStateFlow<AddAccountEntity?>(null)
-    val singleAccount: StateFlow<AddAccountEntity?> = _singleAccount
     fun getAccountById(id: Int){
         viewModelScope.launch {
             _singleAccount.value = useCase.getAccountById(id)

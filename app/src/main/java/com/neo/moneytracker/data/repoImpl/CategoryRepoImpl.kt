@@ -7,6 +7,9 @@ import com.neo.moneytracker.domain.repository.CategoryRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import com.neo.moneytracker.R
+import com.neo.moneytracker.data.localDb.entities.CategoryDataEntity
+import com.neo.moneytracker.data.localDb.entities.CategoryEntity
+import com.neo.moneytracker.data.mapper.toDomain
 import com.neo.moneytracker.domain.model.Category
 import com.neo.moneytracker.domain.model.SubCategory
 import java.io.InputStreamReader
@@ -14,64 +17,47 @@ import java.io.InputStreamReader
 class CategoryRepoImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : CategoryRepository {
+
     override fun getCategoryData(): CategoryData {
         val inputStream = context.assets.open("Categories.json")
         val reader = InputStreamReader(inputStream)
-        val data = Gson().fromJson(reader, CategoryData::class.java)
 
-        val incomeSubcategories = data.income.flatMap { category ->
-            category.subcategories.map {
-                it.copy(iconResId = getIconResId(it.icon))
-            }
-        }.toMutableList()
+        val dataDto = Gson().fromJson(reader, CategoryDataEntity::class.java)
 
-        val expenseSubcategories = data.expenses.flatMap { category ->
-            category.subcategories.map {
-                it.copy(iconResId = getIconResId(it.icon))
-            }
-        }.toMutableList()
+        val domainData = dataDto.toDomain()
 
-        val transferSubcategories = data.transfer.flatMap { category ->
-            category.subcategories.map {
-                it.copy(iconResId = getIconResId(it.icon))
+        val iconResolver: (String) -> Int = { iconName ->
+            context.resources.getIdentifier(iconName, "drawable", context.packageName)
+                .takeIf { it != 0 } ?: R.drawable.notfound
+        }
+
+        fun updateIconRes(categories: List<Category>): List<Category> {
+            return categories.map { category ->
+                category.copy(
+                    subcategories = category.subcategories.map { subCategory ->
+                        subCategory.copy(iconResId = iconResolver(subCategory.icon))
+                    }
+                )
             }
-        }.toMutableList()
+        }
+
+        val incomeWithIcons = updateIconRes(domainData.income)
+        val expensesWithIcons = updateIconRes(domainData.expenses)
+        val transferWithIcons = updateIconRes(domainData.transfer)
 
         val settingsSubcategory = SubCategory(
             name = "Settings",
             icon = "settings",
-            iconResId = getIconResId("settings")
+            iconResId = iconResolver("settings")
         )
 
-        // Add Settings once per category type
-        incomeSubcategories.add(settingsSubcategory)
-        expenseSubcategories.add(settingsSubcategory)
-        transferSubcategories.add(settingsSubcategory)
+        fun addSettings(categories: List<Category>): List<Category> =
+            categories.map { it.copy(subcategories = it.subcategories + settingsSubcategory) }
 
         return CategoryData(
-            income = listOf(
-                Category(
-                    name = "Income",
-                    subcategories = incomeSubcategories
-                )
-            ),
-            expenses = listOf(
-               Category(
-                    name = "Expenses",
-                    subcategories = expenseSubcategories
-                )
-            ),
-            transfer = listOf(
-                    Category(
-                    name = "Transfer",
-                    subcategories = transferSubcategories
-                )
-            )
+            income = addSettings(incomeWithIcons),
+            expenses = addSettings(expensesWithIcons),
+            transfer = addSettings(transferWithIcons)
         )
-    }
-
-    private fun getIconResId(iconName: String): Int {
-        return context.resources.getIdentifier(iconName, "drawable", context.packageName)
-            .takeIf { it != 0 } ?: R.drawable.notfound
     }
 }

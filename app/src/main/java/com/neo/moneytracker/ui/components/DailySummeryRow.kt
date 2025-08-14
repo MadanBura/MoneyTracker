@@ -11,10 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 
 @Composable
-fun DailySummaryRow(date: String, viewModel: TransactionViewModel) {
+fun DailySummaryRow(date: String, viewModel: AccountsViewModel) {
     val totalsMap by viewModel.dateWiseTotals.collectAsState()
     val totals = totalsMap[date] ?: 0 to 0
 

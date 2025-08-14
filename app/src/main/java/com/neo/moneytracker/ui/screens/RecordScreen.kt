@@ -33,7 +33,7 @@ import com.neo.moneytracker.data.mapper.toDomainModel
 import com.neo.moneytracker.ui.components.*
 import com.neo.moneytracker.ui.navigation.Screens
 import com.neo.moneytracker.ui.theme.LemonSecondary
-import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.nio.file.WatchEvent
@@ -130,7 +130,7 @@ private fun DrawerSection(
 @Composable
 fun RecordScreen(
     navController: NavController,
-    transactionViewModel: TransactionViewModel
+    transactionViewModel: AccountsViewModel
 ) {
     var isDrawerOpen by remember { mutableStateOf(false) }
     var selectedBook by remember { mutableStateOf("Default") }

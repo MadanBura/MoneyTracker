@@ -9,7 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.neo.moneytracker.data.localDb.entities.TransactionEntity
 import com.neo.moneytracker.ui.screens.RecordScreen
-import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,7 +47,7 @@ class RecordScreenUiTest {
         )
     )
 
-    private lateinit var fakeTransactionViewModel: TransactionViewModel
+    private lateinit var fakeTransactionViewModel: AccountsViewModel
 
     @Before
     fun setUp() {

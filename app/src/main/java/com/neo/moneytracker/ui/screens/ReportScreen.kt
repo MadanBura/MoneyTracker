@@ -30,17 +30,15 @@ import androidx.navigation.NavHostController
 import com.neo.moneytracker.ui.components.SimpleTabLayout
 import com.neo.moneytracker.ui.theme.LemonSecondary
 import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
-import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportScreen(
     navController: NavHostController,
-    accountViewModel: AccountsViewModel,
-    transactionViewModel: TransactionViewModel
+    accountViewModel: AccountsViewModel
 ) {
-    val totalIncomeAmount = transactionViewModel.incomeTotalAmount.collectAsState().value
-    val expenseAmount = transactionViewModel.expensesTotalAmount.collectAsState().value
+    val totalIncomeAmount = accountViewModel.incomeTotalAmount.collectAsState().value
+    val expenseAmount = accountViewModel.expensesTotalAmount.collectAsState().value
 
     var selectedTab by remember { mutableStateOf("Analytics") }
 

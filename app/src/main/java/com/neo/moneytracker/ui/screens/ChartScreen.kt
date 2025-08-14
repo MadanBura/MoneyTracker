@@ -35,13 +35,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.neo.moneytracker.data.mapper.toDomainModel
 import com.neo.moneytracker.ui.components.SimpleTabLayout
 import com.neo.moneytracker.ui.theme.LemonSecondary
-import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ChartScreen() {
-    val transactionViewModel: TransactionViewModel = hiltViewModel()
+    val transactionViewModel: AccountsViewModel = hiltViewModel()
     var selectedTab by remember { mutableStateOf("Month") }
     val tabs = listOf("Month", "Year")
     var expanded by remember { mutableStateOf(false) }

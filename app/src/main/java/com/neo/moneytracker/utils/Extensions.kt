@@ -2,6 +2,7 @@ package com.neo.moneytracker.utils
 
 
 fun String.toSentenceCase(): String {
-    if (this.isEmpty()) return this
-    return this[0].uppercaseChar() + this.substring(1).lowercase()
+    val trimmed = trim()
+    if (trimmed.isEmpty()) return ""
+    return trimmed[0].uppercaseChar() + trimmed.substring(1).lowercase()
 }

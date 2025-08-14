@@ -21,11 +21,11 @@ import androidx.navigation.NavController
 import com.neo.moneytracker.ui.components.ReorderableSubCategoryList
 import com.neo.moneytracker.ui.components.SimpleTabLayout
 import com.neo.moneytracker.ui.theme.LemonSecondary
-import com.neo.moneytracker.ui.viewmodel.AddViewModel
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 
 @Composable
 fun ManageCategoryScreen(navController: NavController) {
-    val viewModel: AddViewModel = hiltViewModel()
+    val viewModel: AccountsViewModel = hiltViewModel()
     val categoryMap by viewModel.categoryMap
     val categories = categoryMap.keys.toList().dropLast(1)
     var selectedTabIndex by remember { mutableStateOf(0) }

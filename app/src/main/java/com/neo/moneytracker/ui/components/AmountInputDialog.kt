@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
@@ -48,7 +49,6 @@ import com.neo.moneytracker.ui.theme.IconBackGroundColor
 import com.neo.moneytracker.ui.theme.LemonSecondary
 import com.neo.moneytracker.ui.theme.YellowOrange
 import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
-import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
 import com.neo.moneytracker.utils.TransactionType
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -61,7 +61,6 @@ fun AmountInputDialog(
     iconRes: Int,
     selectedCategory: String,
     selectedSubCategory : String,
-    transactionViewModel: TransactionViewModel,
     accountViewModel: AccountsViewModel,
     onTransactionAdded: (TransactionEntity) -> Unit,
     onDismiss : ()->Unit,
@@ -77,6 +76,12 @@ fun AmountInputDialog(
     var selectedDate by remember {
         mutableStateOf(SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(calendar.time))
     }
+
+    val expensesLabel = stringResource(R.string.expenses)
+    val incomeLabel = stringResource(R.string.income)
+    val dateLabel = stringResource(R.string.date)
+    val tickLabel = stringResource(R.string.tick)
+    val backSpaceLabel = stringResource(R.string.backspace)
 
 
     var bottomNavBool by remember{
@@ -218,17 +223,17 @@ fun AmountInputDialog(
                         Button(
                             onClick = {
                                 when (label) {
-                                    "⌫" -> { // Backspace logic
+                                    backSpaceLabel -> { // Backspace logic
                                         amount = if (amount.length > 1) amount.dropLast(1) else "0"
                                     }
-                                    "✔" -> { // Confirm transaction
+                                    tickLabel -> { // Confirm transaction
 //                                        val currentDate =
 //                                            SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
 
                                         val transaction = when(selectedCategory){
-                                            "expenses" ->{
+                                            expensesLabel ->{
                                                 Transaction(
-                                                    id =0,
+                       F                             id =0,
                                                     iconRes = iconRes,
                                                     amount = amount,
                                                     note = note,
@@ -237,7 +242,7 @@ fun AmountInputDialog(
                                                     type = TransactionType.EXPENSES.name
                                                 )
                                             }
-                                            "income" ->{
+                                            incomeLabel ->{
                                                 Transaction(
                                                     id =0,
                                                     iconRes = iconRes,
@@ -255,7 +260,7 @@ fun AmountInputDialog(
                                         note = ""
                                         onDismiss()
                                     }
-                                    "Date" -> {
+                                    dateLabel -> {
                                         showCalendar = true
                                     }
                                     "." -> if (!amount.contains(".")) amount += "."

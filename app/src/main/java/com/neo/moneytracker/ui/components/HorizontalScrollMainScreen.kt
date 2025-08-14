@@ -27,12 +27,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.neo.moneytracker.ui.theme.LemonSecondary
+import com.neo.moneytracker.utils.TransactionType
 import kotlin.math.exp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StickyFirstWithLazyRow(expenseAmount: Int, incomeAmount: Int) {
-    val categories = listOf("Expenses", "Income", "Balance")
+    val categories = listOf(
+        TransactionType.EXPENSES,
+        TransactionType.INCOME,
+        TransactionType.BALANCE
+    )
     var showMonthPicker by remember { mutableStateOf(false) }
 
     if (showMonthPicker) {
@@ -83,19 +88,17 @@ fun StickyFirstWithLazyRow(expenseAmount: Int, incomeAmount: Int) {
                         .padding(0.dp)
                 ) {
                     Column {
-                        Text(category)
+                        Text(category.displayName)
                         Text(
                             text = when (category) {
-                                "Expenses" -> "${expenseAmount}"
-                                "Income" -> "${incomeAmount}"
-                                "Balance" -> "${incomeAmount - expenseAmount}"
-                                else -> "0"
+                                TransactionType.EXPENSES -> "${expenseAmount}"
+                                TransactionType.INCOME -> "${incomeAmount}"
+                                TransactionType.BALANCE -> "${incomeAmount - expenseAmount}"
                             } ,
                             modifier = when (category) {
-                                "Expenses" -> Modifier.testTag("ExpensesField")
-                                "Income" -> Modifier.testTag("IncomeField")
-                                "Balance" -> Modifier.testTag("BalanceField")
-                                else -> Modifier
+                                TransactionType.EXPENSES -> Modifier.testTag("ExpensesField")
+                                TransactionType.INCOME -> Modifier.testTag("IncomeField")
+                                TransactionType.BALANCE -> Modifier.testTag("BalanceField")
                             }
                         )
                     }

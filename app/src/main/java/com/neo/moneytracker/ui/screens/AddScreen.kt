@@ -34,21 +34,17 @@ import com.neo.moneytracker.ui.navigation.SealedBottomNavItem
 import com.neo.moneytracker.ui.theme.IconBackGroundColor
 import com.neo.moneytracker.ui.theme.LemonSecondary
 import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
-import com.neo.moneytracker.ui.viewmodel.AddViewModel
-import com.neo.moneytracker.ui.viewmodel.TransactionViewModel
-import com.neo.moneytracker.ui.viewmodel.UiStateViewModel
 
 @Composable
 fun AddScreen(
     navController: NavController,
-    uiStateViewModel: UiStateViewModel,
-    transactionViewModel: TransactionViewModel,
     accountViewModel: AccountsViewModel,
     transactionId: Int? = null,
     isEdit: Boolean = false
 ) {
-    val viewModel: AddViewModel = hiltViewModel()
+    val viewModel: AccountsViewModel = hiltViewModel()
     //    val context = LocalContext.current
+    viewModel.loadCategories()
     val categoryMap by viewModel.categoryMap
 //    val categoryMap = remember { ReaderHelper.loadFullCategoryMap(context) }
     val categories = categoryMap.keys.toList()
@@ -58,15 +54,15 @@ fun AddScreen(
 
     var selectedItem by remember { mutableStateOf<String?>(null) }
     var selectedIcon by remember { mutableStateOf<Int?>(null) }
-    val dialogVisible by uiStateViewModel.isDialogVisible.collectAsState()
+    val dialogVisible by accountViewModel.isDialogVisible.collectAsState()
 
-    val transactions = transactionViewModel.transactions.collectAsState().value
+    val transactions = accountViewModel.transactions.collectAsState().value
     val transactionToEdit = remember(transactionId, transactions) {
         transactionId?.let { id -> transactions.find { it.id == id } }
     }
 
-    LaunchedEffect(transactionId, transactionViewModel.transactions.collectAsState().value) {
-        println("Transactions available: ${transactionViewModel.transactions.value}")
+    LaunchedEffect(transactionId, accountViewModel.transactions.collectAsState().value) {
+        println("Transactions available: ${accountViewModel.transactions.value}")
         println("Looking for ID: $transactionId")
     }
 
@@ -76,7 +72,7 @@ fun AddScreen(
                 selectedTabIndex = categories.indexOf(tx.category).takeIf { it >= 0 } ?: 0
                 selectedItem = tx.category
                 selectedIcon = tx.iconRes
-                uiStateViewModel.setDialogVisible(true)
+                accountViewModel.setDialogVisible(true)
             }
         }
     }
@@ -158,7 +154,7 @@ fun AddScreen(
                         selectedItem = clickedItem
                         selectedIcon = iconRes
 
-                        uiStateViewModel.setDialogVisible(true)
+                        accountViewModel.setDialogVisible(true)
                     }
                 }
             }
@@ -168,17 +164,16 @@ fun AddScreen(
                     iconRes = selectedIcon!!,
                     selectedCategory = selectedCategory,
                     selectedSubCategory = selectedItem!!,
-                    transactionViewModel = transactionViewModel,
                     onTransactionAdded = { newTransaction ->
                         if (isEdit && transactionToEdit != null) {
                             val updated = newTransaction.copy(id = transactionToEdit!!.id)
-                            transactionViewModel.updateTransaction(updated)
+                            accountViewModel.updateTransaction(updated)
                         } else {
-                            transactionViewModel.addTransaction(newTransaction)
+                            accountViewModel.addTransaction(newTransaction)
                         }
                     },
                     onDismiss = {
-                        uiStateViewModel.setDialogVisible(false)
+                        accountViewModel.setDialogVisible(false)
                         selectedItem = null
                         navController.popBackStack(
                             SealedBottomNavItem.records.route,

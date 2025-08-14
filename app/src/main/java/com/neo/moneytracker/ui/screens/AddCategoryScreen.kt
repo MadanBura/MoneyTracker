@@ -28,7 +28,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.neo.moneytracker.R
 import com.neo.moneytracker.ui.theme.LemonSecondary
-import com.neo.moneytracker.ui.viewmodel.AddViewModel
+import com.neo.moneytracker.ui.viewmodel.AccountsViewModel
 import com.neo.moneytracker.utils.CategoryIconList
 import com.neo.moneytracker.utils.toSentenceCase
 
@@ -37,7 +37,7 @@ import com.neo.moneytracker.utils.toSentenceCase
 fun AddCategoryScreen(
     navController: NavController
 ) {
-    val viewModel: AddViewModel = hiltViewModel()
+    val viewModel: AccountsViewModel = hiltViewModel()
     val categoryMap by viewModel.categoryMap
     val categories = categoryMap.keys.toList().dropLast(1)
     var selectedTabIndex by remember { mutableStateOf(0) }

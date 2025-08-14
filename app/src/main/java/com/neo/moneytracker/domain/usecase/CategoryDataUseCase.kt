@@ -2,8 +2,9 @@ package com.neo.moneytracker.domain.usecase
 
 import com.neo.moneytracker.domain.model.CategoryData
 import com.neo.moneytracker.domain.repository.CategoryRepository
+import javax.inject.Inject
 
-class CategoryDataUseCase(private val repository: CategoryRepository) {
+class CategoryDataUseCase @Inject constructor(private val repository: CategoryRepository) {
     operator fun invoke(): CategoryData {
         return repository.getCategoryData()
     }

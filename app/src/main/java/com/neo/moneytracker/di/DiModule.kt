@@ -10,6 +10,7 @@ import com.neo.moneytracker.domain.repository.AccountRepository
 import com.neo.moneytracker.domain.repository.CategoryRepository
 import com.neo.moneytracker.domain.repository.TransactionRepository
 import com.neo.moneytracker.domain.usecase.CategoryDataUseCase
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,33 +20,23 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class DiModule {
-
-    @Provides
+abstract class DiModule {
+    @Binds
     @Singleton
-    fun provideCategoryRepository(
-        @ApplicationContext context: Context
-    ): CategoryRepository {
-        return CategoryRepoImpl(context)
-    }
+    abstract fun bindTransactionRepository(
+        impl: TransactionImpl
+    ): TransactionRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideCategoryDataUseCase(
-        repository: CategoryRepository
-    ): CategoryDataUseCase {
-        return CategoryDataUseCase(repository)
-    }
+    abstract fun bindAccountRepository(
+        impl: AccountRepositoryImpl
+    ): AccountRepository
 
-    @Provides
-    @Singleton
-    fun providesTransactionRepository(transactionDao: TransactionDao):TransactionRepository{
-        return TransactionImpl(transactionDao)
-    }
 
-    @Provides
+    @Binds
     @Singleton
-    fun providesAccountRepository(addAccount: AddAccountDao): AccountRepository{
-        return AccountRepositoryImpl(addAccount)
-    }
+    abstract fun bindCategoryRepository(
+        impl: CategoryRepoImpl
+    ): CategoryRepository
 }

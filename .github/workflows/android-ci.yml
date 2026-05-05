@@ -28,7 +28,7 @@ jobs:
           key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('**/lockfiles') }}
 
       - name: Grant Permission
-        run: chmod +x ~/.gradle
+        run: chmod +x gradlew
 
 
       - name: Run tests

@@ -4,6 +4,9 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.appdistribution)
 }
 
 android {
@@ -184,5 +187,12 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.1")
     testImplementation("io.mockk:mockk:1.13.5")
 
+    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
+    implementation("com.google.firebase:firebase-analytics")
 
+}
+firebaseAppDistribution {
+    artifactType = "APK"
+    releaseNotes = "New CI Build"
+    testers = "gaonkarswapnil1@gmail.com"
 }

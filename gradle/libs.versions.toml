@@ -37,6 +37,8 @@ roomRuntime = "2.6.1"
 room_version = "2.6.1"
 uiTextGoogleFonts = "1.6.0"
 uiTestJunit4Android = "1.8.3"
+googleServices = "4.4.2"
+firebaseAppDistribution = "5.1.1"
 
 [libraries]
 androidx-compose-bom-v20240500 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -91,4 +93,5 @@ androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-te
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "firebaseAppDistribution" }

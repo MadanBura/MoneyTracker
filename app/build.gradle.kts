@@ -169,16 +169,16 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.8.3")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.8.3")
 
-    testImplementation("org.robolectric:robolectric:4.13")
+    testImplementation("org.robolectric:robolectric:4.16.1")
 
-    androidTestImplementation("org.robolectric:robolectric:4.13")
+    androidTestImplementation("org.robolectric:robolectric:4.16.1")
 
 
     testImplementation("com.google.dagger:hilt-android-testing:2.48")
     kaptAndroidTest("com.google.dagger:hilt-compiler:2.48")
 
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.robolectric:robolectric:4.11.1")
+//    testImplementation("org.robolectric:robolectric:4.11.1")
 
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.1")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.1")

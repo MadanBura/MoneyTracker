@@ -69,7 +69,13 @@ class RecordScreenUiTest {
 
         // Wait for balance to update
         composeRule.waitUntil(timeoutMillis = 4_000) {
-            composeRule.onAllNodesWithTag("BalanceField").fetchSemanticsNodes().isNotEmpty()
+            try {
+                composeRule.onNodeWithTag("BalanceField")
+                    .assertTextContains("-500")
+                true
+            } catch (e: AssertionError) {
+                false
+            }
         }
 
         // Verify balance
